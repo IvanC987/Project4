@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Manage Orders</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Manage Orders</h1>
+    <a href="{{ url_for('admin.dashboard') }}"><button>Back to Dashboard</button></a>
+
+    <!-- Orders Table -->
+    <table border="1">
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer_name }}</td>
+            <td>{{ order.items }}</td>
+            <td>${{ order.total_price }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="POST">
+                    <select name="status">
+                        <option value="Pending" {% if order.status == "Pending" %} selected {% endif %}>Pending</option>
+                        <option value="Preparing" {% if order.status == "Preparing" %} selected {% endif %}>Preparing</option>
+                        <option value="Out for Delivery" {% if order.status == "Out for Delivery" %} selected {% endif %}>Out for Delivery</option>
+                        <option value="Completed" {% if order.status == "Completed" %} selected {% endif %}>Completed</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

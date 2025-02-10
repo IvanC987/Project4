@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Manage Menu</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Manage Menu</h1>
+    <a href="{{ url_for('admin.dashboard') }}"><button>Back to Dashboard</button></a>
+
+    <!-- Menu Items Table -->
+    <h2>Current Menu</h2>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in menu %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>${{ item.price }}</td>
+            <td>{{ item.category }}</td>
+            <td>
+                <a href="{{ url_for('admin.edit_menu_item', item_id=item.id) }}"><button>Edit</button></a>
+                <a href="{{ url_for('admin.delete_menu_item', item_id=item.id) }}"><button>Delete</button></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

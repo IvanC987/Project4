@@ -1,0 +1,43 @@
+/static folder-
+Used to store files like images, CSS, JS files, etc.,
+
+
+/templates-
+Stores HTML files used to render webpages
+    1. /customer- Stores HTML files for customer webpages (Like ordering, checkout and such)
+    2. /admin- Stores HTML files for admin/staff webpages
+
+
+
+/admin-
+Contains Flask Blueprint for admin-specific routes
+
+
+
+
+app.py-
+Primary Flask application file
+
+
+models.py-
+...
+
+
+config.py-
+Holds configurations such as DB keys
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

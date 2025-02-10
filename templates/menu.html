@@ -1,0 +1,8 @@
+<h1>Menu</h1>
+<ul>
+    {% for item in menu %}
+        <li>{{ item.name }} - ${{ item.price }}
+            <button onclick="addToCart({{ item.id }})">Add to Cart</button>
+        </li>
+    {% endfor %}
+</ul>

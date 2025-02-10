@@ -1,0 +1,10 @@
+<h1>Your Cart</h1>
+<ul>
+    {% for item in cart %}
+        <li>{{ item.name }} - ${{ item.price }}
+            <button onclick="removeFromCart({{ item.id }})">Remove</button>
+        </li>
+    {% endfor %}
+</ul>
+<p>Total: ${{ total }}</p>
+<a href="/checkout"><button>Proceed to Checkout</button></a>

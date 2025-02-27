@@ -1,11 +1,22 @@
-<h1>Menu</h1>
-<ul>
-    {% for item in menu %}
-        <li>{{ item.name }} - ${{ item.price }}
-            <button onclick="addToCart({{ item.id }})">Add to Cart</button>
-        </li>
-    {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Flask Webpage</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Menu</h1>
+    <ul>
+        {% for item in menu %}
+            <li>{{ item.name }} - ${{ item.price }}
+                <button onclick="addToCart({{ item.id }})">Add to Cart</button>
+            </li>
+        {% endfor %}
 
 
-    <a href="/"><button>Return to Main Page</button></a>
-</ul>
+        <a href="/"><button>Return to Main Page</button></a>
+    </ul>
+
+</body>
+</html>
+

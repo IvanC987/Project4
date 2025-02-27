@@ -1,10 +1,21 @@
-<h1>Your Cart</h1>
-<ul>
-    {% for item in cart %}
-        <li>{{ item.name }} - ${{ item.price }}
-            <button onclick="removeFromCart({{ item.id }})">Remove</button>
-        </li>
-    {% endfor %}
-</ul>
-<p>Total: ${{ total }}</p>
-<a href="/checkout"><button>Proceed to Checkout</button></a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Flask Webpage</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Your Cart</h1>
+    <ul>
+        {% for item in cart %}
+            <li>{{ item.name }} - ${{ item.price }}
+                <button onclick="removeFromCart({{ item.id }})">Remove</button>
+            </li>
+        {% endfor %}
+    </ul>
+    <p>Total: ${{ total }}</p>
+    <a href="/checkout"><button>Proceed to Checkout</button></a>
+</body>
+</html>
+
+

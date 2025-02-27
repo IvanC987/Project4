@@ -1,3 +1,6 @@
+----------------------------------------------------------------------------------------------------
+Project Structure-
+----------------------------------------------------------------------------------------------------
 /static folder-
 Used to store files like images, CSS, JS files, etc.,
 
@@ -8,11 +11,8 @@ Stores HTML files used to render webpages
     2. /admin- Stores HTML files for admin/staff webpages
 
 
-
 /admin-
 Contains Flask Blueprint for admin-specific routes
-
-
 
 
 app.py-
@@ -20,21 +20,43 @@ Primary Flask application file
 
 
 models.py-
-...
+Contains all the tables needed (like users, orders, menu items, etc.,)
 
 
 config.py-
-Holds configurations such as DB keys
+Holds configurations for MariaDB
+
+
+
+
+----------------------------------------------------------------------------------------------------
+Forward Tunnel-
+----------------------------------------------------------------------------------------------------
+ssh -L 3307:localhost:3306 group4-sp25@turing2.cs.olemiss.edu
+
+Then enter password for this
+
+Next, login to the MariaDB
+
+mysql -u group4-sp25 -p
+
+Then enter password for that
 
 
 
 
 
+----------------------------------------------------------------------------------------------------
+Pushing To Github-
+----------------------------------------------------------------------------------------------------
+Highly recommend just adding in one file at a time to not break anything atm
 
+To push updated/created files to Github:
 
-
-
-
+1. Go to terminal/CMD and cd into the correct directory
+2. Do `git add <filename>`, replace <filename> with the name of the file you want to update/add to repo (e.g. notes.txt)
+3. Next, `git commit -m "<message>"` Replace <message> with your actual message within the double quotes. Can be anything, like "Updates notes.txt" or "Created new html file for ..."
+4. `git push origin main` Then that should reflect the update on github repo. Check to make sure it worked
 
 
 

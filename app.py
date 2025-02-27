@@ -1,14 +1,43 @@
 from flask import Flask, render_template, request
+from flask_sqlalchemy import SQLAlchemy
+from config import Config
 from admin import admin_bp
+from models import User
 
 
 app = Flask(__name__)
+app.config.from_object(Config)
+
+
+from models import db, User
+
+db.init_app(app)
+
 app.register_blueprint(admin_bp)
+
+
+
 
 
 @app.route("/")
 def home():
     return render_template("customer/index.html")
+
+
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return "Signup successful!"
+
+    return render_template("customer/signup.html")
 
 
 @app.route("/menu")

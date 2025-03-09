@@ -1,20 +1,37 @@
+/* general styles */
 body {
-  background-color: whitesmoke;
+  font-family: "Arial", sans-serif;
+  background-color: #e3d5cb;
+  margin: 0;
+  padding: 20px;
   text-align: center;
-  font-family: Arial, sans-serif;
 }
 
 h1 {
-  color: #234;
+  color: #605651;
+  font-size: 2rem;
+  margin: 10px;
 }
 
 p {
   font-size: 50px;
-  color: #555;
+  color: #605651;
+}
+
+.logo img {
+  max-width: 50%;
+  display: block;
+  margin-bottom: 50px;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button {
-  background-color: #c32e26;
+  background-color: #926851;
   color: white;
   padding: 15px 32px;
   border: white;
@@ -23,24 +40,130 @@ button {
 }
 
 button:hover {
-  background-color: #d8572a;
+  background-color: #605651;
 }
 
-body {
-  font-family: "Arial", sans-serif;
-  background-color: #f4f6f9;
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-}
-
-h1 {
+/* signup.html & checkout.html styling */
+.signup,
+.checkout {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   color: #333;
-  font-size: 2rem;
-  margin-bottom: 20px;
+  flex-direction: column;
 }
 
-/* dashboard container */
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #333;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* menu.html & cart.html styling */
+.menu,
+.cart {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+.menu h1,
+.cart h1 {
+  color: #605651;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.menu ul,
+.cart ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.menu li,
+.cart li {
+  padding: 15px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.menu li:hover,
+.cart li:hover {
+  background-color: #e3d5cb;
+}
+
+.menu button .cart button {
+  background-color: #926851;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 15px;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.menu button:hover .cart button:hover {
+  background-color: #605651;
+}
+
+.menu a,
+.cart a {
+  margin-top: 20px;
+  display: block;
+}
+
+.menu a button,
+.cart a button {
+  background-color: #605651;
+}
+
+.menu a button:hover,
+.cart a button:hover {
+  background-color: #926851;
+}
+
+/* dashboard.html styling */
 .dashboard-container {
   display: flex;
   justify-content: center;
@@ -50,7 +173,7 @@ h1 {
 }
 
 .card {
-  background: #fff;
+  background: whitesmoke;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -59,24 +182,32 @@ h1 {
   transition: transform 0.3s ease-in-out;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-}
-
 .card h2 {
   margin: 0;
   font-size: 1.2rem;
-  color: #555;
+  color: #605651;
 }
 
 .card p {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: #926851;
   margin-top: 10px;
 }
 
-/* nav links */
+.card:hover {
+  transform: translateY(-5px);
+  background: #926851;
+}
+
+.card:hover h2 {
+  color: whitesmoke;
+}
+
+.card:hover p {
+  color: #e4d5cb;
+}
+
 .admin-links {
   display: flex;
   justify-content: center;
@@ -84,18 +215,17 @@ h1 {
 }
 
 .admin-links button {
-  background-color: #007bff;
+  background-color: #926851;
   color: #fff;
   border: none;
-  padding: 12px 18px;
+  padding: 18px 24px;
   font-size: 1rem;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: background 0.3s ease-in-out;
 }
 
 .admin-links button:hover {
-  background-color: #0056b3;
+  background-color: #605651;
 }
 
 .admin-links a {
@@ -109,3 +239,4 @@ h1 {
     align-items: center;
   }
 }
+

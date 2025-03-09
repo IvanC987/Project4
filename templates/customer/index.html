@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <title>Flask Webpage</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <h1>Hello World</h1>
-    <p>Project - Online Meal Ordering System</p>
-
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="logo">
+      <img src="/static/images/logo.png" alt="" />
+    </div>
+    <h1>Welcome to Grub and Go!</h1>
+    <!-- <p>Project - Online Meal Ordering System</p> -->
     <!-- Navigation Buttons -->
-    <a href="{{ url_for('signup') }}"><button>Signup</button></a>
-    <a href="{{ url_for('menu') }}"><button>View Menu</button></a>
-    <a href="{{ url_for('view_cart') }}"><button>View Cart</button></a>
-    <a href="{{ url_for('checkout') }}"><button>Checkout</button></a>
-
-</body>
+    <div class="index-buttons">
+      <a href="{{ url_for('signup') }}"><button>Signup</button></a>
+      <a href="{{ url_for('menu') }}"><button>View Menu</button></a>
+      <a href="{{ url_for('view_cart') }}"><button>View Cart</button></a>
+      <a href="{{ url_for('checkout') }}"><button>Checkout</button></a>
+    </div>
+  </body>
 </html>

@@ -1,47 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
+    <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-  </head>
-  <body>
-    <div class="logo">
-      <img src="/static/images/logo.png" alt="brand logo" />
-    </div>
-    <h1>Admin Dashboard</h1>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_styles.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>🍽️ Admin Dashboard</h1>
+            <a href="{{ url_for('admin.admin_logout') }}" class="logout-button">Logout</a>
+        </header>
 
-    <!-- Overview Cards -->
-    <div class="dashboard-container">
-      <div class="card">
-        <h2>Total Orders</h2>
-        <p>{{ total_orders }}</p>
-      </div>
-      <div class="card">
-        <h2>Pending Orders</h2>
-        <p>{{ pending_orders }}</p>
-      </div>
-      <div class="card">
-        <h2>Total Revenue</h2>
-        <p>${{ total_revenue }}</p>
-      </div>
-    </div>
+        <section class="stats-section">
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <p>{{ total_orders }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Orders</h3>
+                <p>{{ active_orders }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Customers</h3>
+                <p>{{ total_customers }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <p>${{ total_revenue }}</p>
+            </div>
+        </section>
 
-    <!-- Navigation Links -->
-    <div class="admin-links">
-      <a href="{{ url_for('admin.manage_orders') }}"
-        ><button>Manage Orders</button></a
-      >
-      <a href="{{ url_for('admin.manage_menu') }}"
-        ><button>Manage Menu</button></a
-      >
-      <a href="{{ url_for('admin.manage_users') }}"
-        ><button>Manage Users</button></a
-      >
+
+        <section class="nav-section">
+            <a href="{{ url_for('admin.manage_orders') }}" class="nav-button">📦 Manage Orders</a>
+            <a href="{{ url_for('admin.manage_menu') }}" class="nav-button">🍔 Manage Menu</a>
+            <a href="{{ url_for('admin.manage_users') }}" class="nav-button">👥 Manage Users</a>
+            <a href="{{ url_for('admin.create_admin') }}" class="nav-button">➕ Create Admin</a>
+        </section>
     </div>
-  </body>
+</body>
 </html>
-

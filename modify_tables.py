@@ -1,6 +1,6 @@
 from app import app, db
 from models import *
-
+from sqlalchemy import text
 
 drop = True
 create = True
@@ -13,9 +13,9 @@ if confirmation.lower() != "y":
 
 with app.app_context():
     if drop:
-        db.session.execute("SET FOREIGN_KEY_CHECKS = 0;")
+        db.session.execute(text("SET FOREIGN_KEY_CHECKS = 0;"))
         db.drop_all()
-        db.session.execute("SET FOREIGN_KEY_CHECKS = 1;")
+        db.session.execute(text("SET FOREIGN_KEY_CHECKS = 1;"))
 
     if create:
         db.create_all()

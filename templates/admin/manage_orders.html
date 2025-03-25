@@ -1,46 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Manage Orders</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_styles.css') }}">
 </head>
 <body>
-    <div class="logo">
-      <img src="images/logo.png" alt="brand logo" />
-    </div>
-    <h1>Manage Orders</h1>
-    <a href="{{ url_for('admin.dashboard') }}"><button>Back to Dashboard</button></a>
+    <div class="admin-container">
+        <header>
+            <h1>📦 Manage Orders</h1>
+            <a href="{{ url_for('admin.dashboard') }}" class="logout-button">⬅ Back to Dashboard</a>
+        </header>
+<p>Orders count: {{ orders | length }}</p>
 
-    <!-- Orders Table -->
-    <table border="1">
-        <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Items</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-        {% for order in orders %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.customer_name }}</td>
-            <td>{{ order.items }}</td>
-            <td>${{ order.total_price }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-                <form action="{{ url_for('admin.update_order', order_id=order.id) }}" method="POST">
-                    <select name="status">
-                        <option value="Pending" {% if order.status == "Pending" %} selected {% endif %}>Pending</option>
-                        <option value="Preparing" {% if order.status == "Preparing" %} selected {% endif %}>Preparing</option>
-                        <option value="Out for Delivery" {% if order.status == "Out for Delivery" %} selected {% endif %}>Out for Delivery</option>
-                        <option value="Completed" {% if order.status == "Completed" %} selected {% endif %}>Completed</option>
-                    </select>
-                    <button type="submit">Update</button>
+        <section>
+            {% if orders %}
+                <form method="POST" action="{{ url_for('admin.manage_orders') }}">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer ID</th>
+                                <th>Customer Username</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.order_id }}</td>
+                                <td>{{ order.customer_id }}</td>
+                                <td>{{ user_map[order.customer_id] }}</td>
+                                <td>
+                                    <select name="status_{{ order.order_id }}">
+                                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                        <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
+                                        <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                                        <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                    </select>
+                                </td>
+                                <td>${{ order.total_price }}</td>
+                                <td>{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <button type="submit">✅ Confirm Updates</button>
                 </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+
+            {% else %}
+                <p>No orders found.</p>
+            {% endif %}
+        </section>
+    </div>
 </body>
 </html>

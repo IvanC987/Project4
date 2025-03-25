@@ -1,14 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from admin import admin_bp
-from models import User
 
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-
+# Importing here to avoid the circular import err
 from models import db, User
 
 db.init_app(app)
@@ -31,7 +30,13 @@ def signup():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        new_user = User(username=username, email=email, password=password)
+        # A simple check for dedup of whether a user already exist with that email/username
+        existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
+        if existing_user:
+            flash("User already exists with that email or username.")
+            return redirect(url_for('signup'))
+
+        new_user = User(username=username, email=email, password=password, role="customer")
         db.session.add(new_user)
         db.session.commit()
 

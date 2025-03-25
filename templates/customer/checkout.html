@@ -5,13 +5,14 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="{{ url_for('static', filename='styles.css') }}"
+      href="{{ url_for('static', filename='customer_styles.css') }}"
     />
   </head>
   <body>
     <div class="checkout">
       <div class="logo">
-        <img src="/static/images/logo.png" alt="brand logo" />
+        <img src="{{ url_for('static', filename='images/T1.png') }}" alt="Test 1">
+
       </div>
       <h1>Checkout</h1>
       <form action="/checkout" method="POST">

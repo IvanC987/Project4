@@ -56,7 +56,7 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username
 
-            return redirect(url_for('menu'))
+            return redirect(url_for('home'))
 
         flash("Invalid credentials, please try again.")
 

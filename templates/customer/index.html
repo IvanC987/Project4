@@ -10,16 +10,12 @@
   </head>
   <body>
     <div class="logo">
-      <img src="/static/images/logo.png" alt="" />
+      <img src="/static/images/logo.png" alt="The Rusty Skillet Logo" />
     </div>
-    <h1>Welcome to Grub and Go!</h1>
-    <!-- <p>Project - Online Meal Ordering System</p> -->
-    <!-- Navigation Buttons -->
-    <div class="index-buttons">
-      <a href="{{ url_for('signup') }}"><button>Signup</button></a>
-      <a href="{{ url_for('menu') }}"><button>View Menu</button></a>
-      <a href="{{ url_for('view_cart') }}"><button>View Cart</button></a>
-      <a href="{{ url_for('checkout') }}"><button>Checkout</button></a>
+    <div class="container">
+      <h1>Welcome to The Rusty Skillet!</h1>
+      <br /><br />
+      <a href="{{ url_for('signup') }}" class="get-started-btn">Get Started</a>
     </div>
   </body>
 </html>

@@ -44,6 +44,24 @@ def signup():
 
     return render_template("customer/signup.html")
 
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.password == password:
+            session['user_id'] = user.id
+            session['username'] = user.username
+
+            return redirect(url_for('home'))
+
+        flash("Invalid credentials, please try again.")
+
+    return render_template("customer/login.html")
+
 
 @app.route("/menu")
 def menu():

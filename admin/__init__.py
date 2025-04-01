@@ -7,7 +7,7 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
 @admin_bp.before_request
-def restrict_to_admins():
+def restrict_to_admins():  # This kind of gatekeeps the admin pages, until authenticated
     # Only allow through only if visiting login. Otherwise it will cause infinite recursion
     # (e.g. login_page -> checks this requirement -> redirectly to login page -> back to checking this, etc.
     if request.endpoint == 'admin.admin_login':

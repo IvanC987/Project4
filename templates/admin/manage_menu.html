@@ -1,47 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
+    <meta charset="UTF-8">
     <title>Manage Menu</title>
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='admin_styles.css') }}"
-    />
-  </head>
-  <body>
-    <div class="logo">
-      <img src="images/logo.png" alt="brand logo" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_styles.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Manage Menu</h1>
+            <a href="{{ url_for('admin.dashboard') }}" class="logout-button">⬅ Back to Dashboard</a>
+        </header>
+
+        <h2>Add New Menu Item</h2>
+        <form method="POST" action="{{ url_for('admin.manage_menu') }}">
+            <input type="text" name="name" placeholder="Item Name" required>
+            <input type="text" name="description" placeholder="Description" required>
+            <input type="text" name="ingredient" placeholder="Ingredients" required>
+            <input type="text" name="category" placeholder="Category" required>
+            <input type="number" step="0.01" name="price" placeholder="Price ($)" required>
+            <button type="submit">Add Item</button>
+        </form>
+
+        <h2>Existing Menu Items</h2>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Ingredients</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in menu_items %}
+                <tr>
+                    <form method="POST" action="{{ url_for('admin.update_menu_item', item_id=item.item_id) }}">
+                        <td><input type="text" name="name" value="{{ item.name }}"></td>
+                        <td><input type="text" name="category" value="{{ item.category }}"></td>
+                        <td><input type="number" step="0.01" name="price" value="{{ item.price }}"></td>
+                        <td><input type="text" name="description" value="{{ item.description }}"></td>
+                        <td><input type="text" name="ingredient" value="{{ item.ingredient }}"></td>
+                        <td>
+                            <select name="is_available">
+                                <option value="1" {% if item.is_available %}selected{% endif %}>Available</option>
+                                <option value="0" {% if not item.is_available %}selected{% endif %}>Out of Stock</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit">Save</button>
+                            <a href="{{ url_for('admin.delete_menu_item', item_id=item.item_id) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <h1>Manage Menu</h1>
-    <a href="{{ url_for('admin.dashboard') }}"
-      ><button>Back to Dashboard</button></a
-    >
-
-    <!-- Menu Items Table -->
-    <h2>Current Menu</h2>
-    <table border="1">
-      <tr>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Category</th>
-        <th>Actions</th>
-      </tr>
-      {% for item in menu %}
-      <tr>
-        <td>{{ item.name }}</td>
-        <td>${{ item.price }}</td>
-        <td>{{ item.category }}</td>
-        <td>
-          <a href="{{ url_for('admin.edit_menu_item', item_id=item.id) }}"
-            ><button>Edit</button></a
-          >
-          <a href="{{ url_for('admin.delete_menu_item', item_id=item.id) }}"
-            ><button>Delete</button></a
-          >
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </body>
+</body>
 </html>
-

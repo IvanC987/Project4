@@ -2,7 +2,7 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from admin import admin_bp
-
+from driver import driver_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -13,8 +13,7 @@ from models import db, User
 db.init_app(app)
 
 app.register_blueprint(admin_bp)
-
-
+app.register_blueprint(driver_bp)
 
 
 

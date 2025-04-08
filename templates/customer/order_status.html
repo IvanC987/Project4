@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Flask Webpage</title>
+    <title>Order Status</title>
     <link
       rel="stylesheet"
       type="text/css"
@@ -21,20 +21,19 @@
         </ul>
       </nav>
     </header>
-    <div class="checkout">
-      <h1>Checkout</h1>
-      <form action="/checkout" method="POST">
-        <label>Name:</label>
-        <input type="text" name="name" required /><br />
-
-        <label>Address:</label>
-        <input type="text" name="address" required /><br />
-
-        <label>Phone:</label>
-        <input type="text" name="phone" required /><br />
-
-        <button type="submit">Place Order</button>
-      </form>
+    <br /><br /><br />
+    <div class="order-status">
+      <h1>Your Order Status</h1>
+      <ul>
+        {% for order in orders %}
+        <li>
+          Order ID: {{ order.order_id }} - Status: {{ order.status }} - Total:
+          ${{ order.total_price }}
+        </li>
+        {% else %}
+        <li>No orders found.</li>
+        {% endfor %}
+      </ul>
     </div>
   </body>
 </html>

@@ -9,21 +9,51 @@
     />
   </head>
   <body>
-    <div class="logo">
-      <img src="/static/images/logo.png" alt="brand logo" />
-    </div>
+    <header>
+      <nav class="navbar">
+        <div class="nav-logo">
+          <!-- <img src="/static/images/logo.png" alt="logo" /> -->
+        </div>
+        <ul class="nav-links">
+          <li><a href="menu">Menu</a></li>
+          <li>
+            <a href="order_status">Order Status</a>
+          </li>
+          <li><a href="cart">Cart</a></li>
+          <li><a href="checkout">Checkout</a></li>
+        </ul>
+      </nav>
+    </header>
+    <br /><br /><br />
     <div class="cart">
-    <h1>Your Cart</h1>
-    <ul>
-      {% for item in cart %}
-      <li>
-        {{ item.name }} - ${{ item.price }}
-        <button onclick="removeFromCart({{ item.id }})">Remove</button>
-      </li>
-      {% endfor %}
-    </ul>
-    <p>Total: ${{ total }}</p>
-    <a href="/checkout"><button>Proceed to Checkout</button></a>
+      <h1>Your Cart</h1>
+      <ul>
+        {% for item in cart %}
+        <li>
+          {{ item.quantity }}x {{ item.name }} - ${{ item.total }}
+          <button onclick="removeFromCart({{ item.id }})">Remove</button>
+        </li>
+        {% endfor %}
+      </ul>
+      <p>Total: ${{ total }}</p>
+      <a href="/checkout"><button>Proceed to Checkout</button></a>
+    </div>
+
+    <script>
+      function removeFromCart(itemId) {
+        fetch("/remove_from_cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ item_id: itemId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            location.reload(); // reload cart page to update UI
+          });
+      }
+    </script>
   </body>
-</div>
 </html>
+

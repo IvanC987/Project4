@@ -9,21 +9,50 @@
     />
   </head>
   <body>
-    <div class="logo">
-      <img src="/static/images/logo.png" alt="" />
-    </div>
+    <header>
+      <nav class="navbar">
+        <ul class="nav-links">
+          <li><a href="menu">Menu</a></li>
+          <li>
+            <a href="order_status">Order Status</a>
+          </li>
+          <li><a href="cart">Cart</a></li>
+          <li><a href="checkout">Checkout</a></li>
+        </ul>
+      </nav>
+    </header>
+    <br /><br /><br />
     <div class="menu">
+      <div class="logo">
+        <img src="/static/images/logo.png" alt="brand logo" />
+      </div>
       <h1>Menu</h1>
       <ul>
         {% for item in menu %}
         <li>
-          {{ item.name }} - ${{ item.price }}
-          <button onclick="addToCart({{ item.id }})">Add to Cart</button>
+          <strong>{{ item.name }}</strong> - ${{ item.price }}<br />
+          {{ item.description }}<br />
+          <button onclick="addToCart({{ item.item_id }})">Add to Cart</button>
         </li>
         {% endfor %}
-
-        <a href="/"><button>Return to Main Page</button></a>
       </ul>
     </div>
+
+    <script>
+      function addToCart(itemId) {
+        fetch("/add_to_cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ item_id: itemId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert(data.message); // or update UI
+          });
+      }
+    </script>
   </body>
 </html>
+

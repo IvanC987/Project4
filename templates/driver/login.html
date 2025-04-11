@@ -1,10 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
     <title>Driver Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='driver_styles.css') }}">
 </head>
 <body>
-    <p>Hello World</p>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <h1>Driver Login</h1>
+            <form method="POST" action="{{ url_for('driver.driver_login') }}">
+                <label for="email">Email</label>
+                <input type="email" name="email" required>
+
+                <label for="password">Password</label>
+                <input type="password" name="password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flash">
+                  {% for message in messages %}
+                    <p>{{ message }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+        </div>
+    </div>
 </body>
 </html>

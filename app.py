@@ -1,28 +1,19 @@
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from config import Config
 from admin import admin_bp
 from driver import driver_bp
 from models import User, MenuItem, OrderHistory, db, OrderItem
-from flask import render_template
-from flask import jsonify
 
-
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Importing here to avoid the circular import err
-from models import db, User
+app = Flask(__name__)  # Create flask app instance
+app.config.from_object(Config)  # Configures the instance based on the Config class in config.py
 
 db.init_app(app)
 
-app.register_blueprint(admin_bp)
-app.register_blueprint(driver_bp)
+app.register_blueprint(admin_bp)  # Connects to admin routes
+app.register_blueprint(driver_bp)  # Connects to driver routes
 
 
-
-
-@app.route("/")
+@app.route("/")  # Main "home" route
 def home():
     return render_template("customer/index.html")
 
@@ -40,16 +31,19 @@ def signup():
             flash("User already exists with that email or username.")
             return redirect(url_for('signup'))
 
+        # Else, add this new user to DB
         new_user = User(username=username, email=email, password=password, role="customer")
         db.session.add(new_user)
         db.session.commit()
 
         return "Signup successful!"
 
+    # If GET request, just load signup html
     return render_template("customer/signup.html")
 
+
 @app.route("/login", methods=['GET', 'POST'])
-def login():
+def login():  # Very similar to signup
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -73,9 +67,11 @@ def menu():
     available_items = MenuItem.query.filter_by(is_available=True).all()
     return render_template('customer/menu.html', menu=available_items)
 
+
+# Only available as a POST method since we're adding items to cart
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    if 'cart' not in session:
+    if 'cart' not in session:  # Create cart
         session['cart'] = []
 
     data = request.get_json()
@@ -91,11 +87,10 @@ def add_to_cart():
         return jsonify({"message": "Item not found"}), 404
 
 
-
 @app.route("/cart")
 def view_cart():
     cart_ids = session.get('cart', [])
-    
+
     # If you're storing duplicates for quantity, count them
     from collections import Counter
     cart_count = Counter(cart_ids)
@@ -120,6 +115,7 @@ def view_cart():
 
     return render_template("customer/cart.html", cart=cart, total=round(total_price, 2))
 
+
 @app.route('/remove_from_cart', methods=['POST'])
 def remove_from_cart():
     data = request.get_json()
@@ -135,7 +131,6 @@ def remove_from_cart():
     return jsonify({'message': 'Item removed from cart'})
 
 
-
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if 'user_id' not in session:  # Ensure user is logged in
@@ -147,14 +142,14 @@ def checkout():
         name = request.form.get('name')
         address = request.form.get('address')
         phone = request.form.get('phone')
-        
+
         # Check if cart exists in session
         if 'cart' not in session:
             flash("Your cart is empty!")
             return redirect(url_for('menu'))  # Redirect to menu if cart is empty
 
         cart_ids = session.get('cart', [])
-        
+
         # Get the list of menu items based on cart item IDs
         from collections import Counter
         cart_count = Counter(cart_ids)
@@ -162,7 +157,7 @@ def checkout():
 
         # Calculate the total price
         total_price = sum(item.price * cart_count[item.item_id] for item in items)
-        
+
         # Create a new order in the OrderHistory table
         new_order = OrderHistory(customer_id=user_id, total_price=total_price, status='pending')
         db.session.add(new_order)
@@ -173,12 +168,12 @@ def checkout():
             quantity = cart_count[item.item_id]
             order_item = OrderItem(order_id=new_order.order_id, item_id=item.item_id, quantity=quantity)
             db.session.add(order_item)
-        
+
         db.session.commit()  # Commit the order items
-        
+
         # Clear the cart after placing the order
         session.pop('cart', None)
-        
+
         flash("Order placed successfully!")
         return redirect(url_for('order_status'))  # Redirect to the order status page
 
@@ -215,9 +210,5 @@ def order_status():
     return render_template("customer/order_status.html", orders=order_details)
 
 
-
-
 if __name__ == '__main__':
-    cart_items = [{"id": 1, "item": "Cheese Burger", "price": 5.99}]
-
     app.run(debug=True)

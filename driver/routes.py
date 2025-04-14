@@ -6,16 +6,15 @@ from models import User, OrderHistory, Delivery, db
 # First page should be driver login, where calling "/" would default to login
 @driver_bp.route('/')
 def driver_home():
-    return redirect(url_for('driver.driver_login')) # <- redirects us to the driver_login function below
-
+    return redirect(url_for('driver.driver_login'))  # <- redirects us to the driver_login function below
 
 
 # LOGIN
 @driver_bp.route('/login', methods=['GET', 'POST'])
 def driver_login():
-    if request.method == 'POST': # If users submitted anything e.g. `login` button
-        email = request.form['email'] # Get the email
-        password = request.form['password'] # Get password
+    if request.method == 'POST':  # If users submitted anything e.g. `login` button
+        email = request.form['email']  # Get the email
+        password = request.form['password']  # Get password
 
          # Search DB via matching email and role and getting first match
         user = User.query.filter_by(email=email, role='driver').first()
@@ -31,8 +30,9 @@ def driver_login():
 
 #------------------------------------
 
+
 # DASHBOARD
-@driver_bp.route('/dashboard') # Main page for drivers after auth
+@driver_bp.route('/dashboard')  # Main page for drivers after auth
 def dashboard():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
@@ -58,7 +58,10 @@ def dashboard():
         out_for_delivery_orders=out_for_delivery_orders,
         completed_orders=completed_orders
     )
+
+
 #----------------------------------------
+
 
 # VIEW ORDERS
 @driver_bp.route('/orders')
@@ -81,9 +84,10 @@ def view_orders():
 
     orders = orders_query.all()
 
-    return render_template('driver/orders.html', orders=orders, status_filter=status_filter)
+    return render_template('driver/assigned_orders.html', orders=orders, status_filter=status_filter)
 
 #----------------------------------------
+
 
 # UPDATE ORDER STATUS
 @driver_bp.route('/orders/update', methods=['POST'])
@@ -117,7 +121,9 @@ def update_order_status():
 
     return redirect(url_for('driver.view_orders'))
 
-#----------------------------------------
+
+# ----------------------------------------
+
 
 # LOGOUT: Clear session and redirect
 @driver_bp.route('/logout')

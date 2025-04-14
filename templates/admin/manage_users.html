@@ -24,7 +24,7 @@
 
         <form method="GET" action="{{ url_for('admin.manage_users') }}" style="margin-bottom: 20px;">
             <input type="text" name="q" placeholder="Search by username or email" value="{{ request.args.get('q', '') }}">
-            <button type="submit">🔍 Search</button>
+            <button type="submit">Search</button>
         </form>
 
         <table class="orders-table">

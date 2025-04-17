@@ -8,7 +8,6 @@ from models import User, OrderHistory, Delivery, db
 def driver_home():
     return redirect(url_for('driver.driver_login'))  # <- redirects us to the driver_login function below
 
-
 # LOGIN
 @driver_bp.route('/login', methods=['GET', 'POST'])
 def driver_login():
@@ -72,20 +71,28 @@ def view_orders():
     driver_id = session['driver_id']
     status_filter = request.args.get('status')
 
-    # Get deliveries assigned to this driver
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
     order_ids = [d.order_id for d in deliveries]
 
-    # Query orders assigned to the driver
-    orders_query = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids))
+    orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
 
-    if status_filter:
-        orders_query = orders_query.filter_by(status=status_filter)
+    combined_orders = []
+    for order in orders:
+        delivery = next((d for d in deliveries if d.order_id == order.order_id), None)
+        customer = User.query.get(order.customer_id)
 
-    orders = orders_query.all()
+        if status_filter and delivery.status != status_filter:
+            continue
 
-    return render_template('driver/assigned_orders.html', orders=orders, status_filter=status_filter)
+        combined_orders.append({
+            'order_id': order.order_id,
+            'customer_name': customer.username if customer else 'Unknown',
+            'customer_address': customer.email if customer else 'Unknown',
+            'items': 'N/A (for now)',
+            'status': delivery.status
+        })
 
+    return render_template('driver/order.html', orders=combined_orders, status_filter=status_filter)
 #----------------------------------------
 
 
@@ -96,21 +103,15 @@ def update_order_status():
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
-
-    # Get deliveries to find the relevant order_ids
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
-    order_ids = [d.order_id for d in deliveries]
-
-    # Query the orders
-    orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
     updates = 0
 
-    for order in orders:
-        key = f"status_{order.order_id}"
+    for delivery in deliveries:
+        key = f"status_{delivery.order_id}"
         new_status = request.form.get(key)
 
-        if new_status and new_status != order.status:
-            order.status = new_status
+        if new_status and new_status != delivery.status:
+            delivery.status = new_status
             updates += 1
 
     if updates:

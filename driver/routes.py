@@ -31,22 +31,18 @@ def driver_login():
 
 
 # DASHBOARD
-@driver_bp.route('/dashboard')  # Main page for drivers after auth
+@driver_bp.route('/dashboard')
 def dashboard():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
 
-    # Get deliveries assigned to this driver
+    # Get all deliveries for this driver
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
-    order_ids = [delivery.order_id for delivery in deliveries]
 
-    # Get matching order records
-    orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
-
-    total_assigned = len(orders)
-    pending_orders = len([o for o in orders if o.status == 'pending'])
+    total_assigned = len(deliveries)
+    pending_orders = len([d for d in deliveries if d.status == 'pending'])
     out_for_delivery_orders = len([d for d in deliveries if d.status == 'in-transit'])
     completed_orders = len([d for d in deliveries if d.status == 'delivered'])
 
@@ -57,7 +53,6 @@ def dashboard():
         out_for_delivery_orders=out_for_delivery_orders,
         completed_orders=completed_orders
     )
-
 
 #----------------------------------------
 
@@ -92,7 +87,7 @@ def view_orders():
             'status': delivery.status
         })
 
-    return render_template('driver/order.html', orders=combined_orders, status_filter=status_filter)
+    return render_template('driver/assigned_order.html', orders=combined_orders, status_filter=status_filter)
 #----------------------------------------
 
 

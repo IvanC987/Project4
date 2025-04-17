@@ -3,51 +3,41 @@ from . import driver_bp
 from models import User, OrderHistory, Delivery, db
 
 
-# First page should be driver login, where calling "/" would default to login
 @driver_bp.route('/')
 def driver_home():
-    return redirect(url_for('driver.driver_login'))  # <- redirects us to the driver_login function below
+    return redirect(url_for('driver.driver_login'))
 
 
-# LOGIN
 @driver_bp.route('/login', methods=['GET', 'POST'])
 def driver_login():
-    if request.method == 'POST':  # If users submitted anything e.g. `login` button
-        email = request.form['email']  # Get the email
-        password = request.form['password']  # Get password
-
-         # Search DB via matching email and role and getting first match
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
         user = User.query.filter_by(email=email, role='driver').first()
 
         if user and user.password == password:
             session['driver_id'] = user.id
             session['user_role'] = user.role
             return redirect(url_for('driver.dashboard'))
-        else: #else get an error
+        else:
             flash('Invalid credentials or not a driver.')
 
     return render_template('driver/login.html')
 
-#------------------------------------
 
-
-# DASHBOARD
-@driver_bp.route('/dashboard')  # Main page for drivers after auth
+@driver_bp.route('/dashboard')
 def dashboard():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
 
-    # Get deliveries assigned to this driver
+    # Get deliveries for this driver (This is the correct data source!)
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
-    order_ids = [delivery.order_id for delivery in deliveries]
 
-    # Get matching order records
-    orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
-
-    total_assigned = len(orders)
-    pending_orders = len([o for o in orders if o.status == 'pending'])
+    # Use only deliveries table to count stats
+    total_assigned = len(deliveries)
+    pending_orders = len([d for d in deliveries if d.status == 'pending'])
     out_for_delivery_orders = len([d for d in deliveries if d.status == 'in-transit'])
     completed_orders = len([d for d in deliveries if d.status == 'delivered'])
 
@@ -60,10 +50,8 @@ def dashboard():
     )
 
 
-#----------------------------------------
 
 
-# VIEW ORDERS
 @driver_bp.route('/orders')
 def view_orders():
     if 'driver_id' not in session:
@@ -71,12 +59,8 @@ def view_orders():
 
     driver_id = session['driver_id']
     status_filter = request.args.get('status')
-
-    # Get deliveries assigned to this driver
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
     order_ids = [d.order_id for d in deliveries]
-
-    # Query orders assigned to the driver
     orders_query = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids))
 
     if status_filter:
@@ -86,22 +70,15 @@ def view_orders():
 
     return render_template('driver/assigned_orders.html', orders=orders, status_filter=status_filter)
 
-#----------------------------------------
 
-
-# UPDATE ORDER STATUS
 @driver_bp.route('/orders/update', methods=['POST'])
 def update_order_status():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
-
-    # Get deliveries to find the relevant order_ids
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
     order_ids = [d.order_id for d in deliveries]
-
-    # Query the orders
     orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
     updates = 0
 
@@ -122,14 +99,11 @@ def update_order_status():
     return redirect(url_for('driver.view_orders'))
 
 
-# ----------------------------------------
-
 @driver_bp.route('/available')
 def available_orders():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
-    # Orders not yet assigned in delivery table
     assigned_order_ids = [d.order_id for d in Delivery.query.all()]
     unassigned_orders = OrderHistory.query.filter(~OrderHistory.order_id.in_(assigned_order_ids)).all()
 
@@ -139,41 +113,32 @@ def available_orders():
         available_orders.append({
             'order_id': order.order_id,
             'customer_name': customer.username,
-            'customer_address': customer.email,  # use address field if exists
+            'customer_address': customer.email,
             'items': 'N/A',
             'status': order.status
         })
 
     return render_template('driver/available_orders.html', orders=available_orders)
 
-# ----------------------------------------
+
 @driver_bp.route('/claim/<int:order_id>', methods=['POST'])
 def claim_order(order_id):
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
-
-    # Check if this order is already claimed
     existing = Delivery.query.filter_by(order_id=order_id).first()
     if existing:
         flash('Order already claimed.')
         return redirect(url_for('driver.available_orders'))
 
-    new_delivery = Delivery(
-        driver_id=driver_id,
-        order_id=order_id,
-        status='pending'
-    )
+    new_delivery = Delivery(driver_id=driver_id, order_id=order_id, status='pending')
     db.session.add(new_delivery)
     db.session.commit()
     flash(f"Successfully claimed order #{order_id}.")
     return redirect(url_for('driver.view_orders'))
 
 
-
-
-# LOGOUT: Clear session and redirect
 @driver_bp.route('/logout')
 def driver_logout():
     session.clear()

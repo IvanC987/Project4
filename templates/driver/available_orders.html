@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Orders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='driver_styles.css') }}">
+</head>
+<body>
+    <div class="orders-container">
+        <h1>Available Orders to Claim</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">
+              {% for message in messages %}
+                <p>{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Claim</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.customer_address }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('driver.claim_order', order_id=order.order_id) }}">
+                            <button type="submit">Claim</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('driver.dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

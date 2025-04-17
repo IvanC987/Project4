@@ -98,8 +98,9 @@ class Delivery(db.Model):
     delivery_time- When the order was delivered
     """
 
-    driver_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order_history.order_id'), nullable=False)
+    # Together acts as composite key
+    driver_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)  # fk
+    order_id = db.Column(db.Integer, db.ForeignKey('order_history.order_id'), primary_key=True)  # also fk
 
     status = db.Column(
         db.Enum('pending', 'in-transit', 'delivered', 'canceled'),

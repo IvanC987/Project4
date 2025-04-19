@@ -12,7 +12,7 @@
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
 
-        <!-- Flash message  -->
+        <!-- Flash messages -->
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <div class="flash">
@@ -23,19 +23,17 @@
           {% endif %}
         {% endwith %}
 
-        <!-- Filter form (GET) -->
         <form method="get" class="filter-form">
             <label for="status">Filter by Status:</label>
             <select name="status">
                 <option value="">All</option>
                 <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-                <option value="out for delivery" {% if status_filter == 'out for delivery' %}selected{% endif %}>Out for Delivery</option>
-                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="in-transit" {% if status_filter == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
+                <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Completed</option>
             </select>
             <button type="submit">Filter</button>
         </form>
 
-        <!-- Order update form (POST) -->
         <form method="POST" action="{{ url_for('driver.update_order_status') }}">
             <table>
                 <thead>
@@ -51,15 +49,14 @@
                     {% for order in orders %}
                     <tr>
                         <td>{{ order.order_id }}</td>
-                        <td>{{ order.items }}</td>
+                        <td>{{ order['items'] }}</td>
                         <td>{{ order.customer_name }}</td>
                         <td>{{ order.customer_address }}</td>
                         <td>
-                            <!-- Dropdown to update status -->
                             <select name="status_{{ order.order_id }}">
                                 <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="out for delivery" {% if order.status == 'out for delivery' %}selected{% endif %}>Out for Delivery</option>
-                                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Completed</option>
                             </select>
                         </td>
                     </tr>
@@ -67,11 +64,9 @@
                 </tbody>
             </table>
 
-            <!-- Submit updates -->
             <button type="submit" class="update-button">Update Statuses</button>
         </form>
 
-        <!-- Back to dashboard link -->
         <a href="{{ url_for('driver.dashboard') }}" class="back-button">Back to Dashboard</a>
     </div>
 </body>

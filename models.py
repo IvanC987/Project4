@@ -71,6 +71,8 @@ class OrderHistory(db.Model):
         nullable=False
     )
 
+    special_instructions = db.Column(db.String(500)) 
+
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
 

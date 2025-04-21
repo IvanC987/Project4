@@ -7,15 +7,73 @@
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
+    <style>
+      /* card-specific styling */
+      .order-status {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #f4f4f4;
+        border-radius: 10px;
+      }
+
+      .order-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.2s;
+      }
+
+      .order-card:hover {
+        transform: scale(1.02);
+      }
+
+      .order-header {
+        display: flex;
+        flex-direction: column;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .order-body {
+        font-size: 0.95rem;
+      }
+
+      .no-orders {
+        text-align: center;
+        font-style: italic;
+        color: gray;
+      }
+
+      .order-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem; /* space between cards */
+        justify-content: center;
+      }
+
+      .order-card {
+        flex: 1 1 calc(33.333% - 1rem); /* 3 per row with spacing */
+        box-sizing: border-box;
+        margin: 0.5rem 0;
+      }
+
+      .refresh-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+      }
+    </style>
   </head>
   <body>
     <header>
       <nav class="navbar">
         <ul class="nav-links">
           <li><a href="menu">Menu</a></li>
-          <li>
-            <a href="order_status">Order Status</a>
-          </li>
+          <li><a href="order_status">Order Status</a></li>
           <li><a href="cart">Cart</a></li>
           <li><a href="checkout">Checkout</a></li>
         </ul>
@@ -23,17 +81,31 @@
     </header>
     <br /><br /><br />
     <div class="order-status">
+      <div class="refresh-container">
+        <button class="refresh-button" onclick="location.reload();">
+          ⟳ Refresh
+        </button>
+      </div>
       <h1>Your Order Status</h1>
-      <ul>
+
+      {% if orders %}
+      <div class="order-grid">
         {% for order in orders %}
-        <li>
-          Order ID: {{ order.order_id }} - Status: {{ order.status }} - Total:
-          ${{ order.total_price }}
-        </li>
-        {% else %}
-        <li>No orders found.</li>
+        <div class="order-card">
+          <div class="order-header">
+            <span>Order #{{ order.order_id }}</span>
+            <span>Status: {{ order.status }}</span>
+          </div>
+          <div class="order-body">
+            <p>Total: ${{ order.total_price }}</p>
+          </div>
+        </div>
         {% endfor %}
-      </ul>
+      </div>
+      {% else %}
+      <p class="no-orders">No orders found.</p>
+      {% endif %}
     </div>
   </body>
 </html>
+

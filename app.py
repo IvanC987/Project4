@@ -61,6 +61,7 @@ def login():  # Very similar to signup
     return render_template("customer/login.html")
 
 
+
 @app.route('/menu')
 def menu():
     # Get only available items
@@ -142,6 +143,8 @@ def checkout():
         name = request.form.get('name')
         address = request.form.get('address')
         phone = request.form.get('phone')
+        instructions = request.form.get('instructions')  
+
 
         # Check if cart exists in session
         if 'cart' not in session:
@@ -159,9 +162,14 @@ def checkout():
         total_price = sum(item.price * cart_count[item.item_id] for item in items)
 
         # Create a new order in the OrderHistory table
-        new_order = OrderHistory(customer_id=user_id, total_price=total_price, status='pending')
+        new_order = OrderHistory(
+            customer_id=user_id,
+            total_price=total_price,
+            status='pending',
+            special_instructions=instructions 
+        )
         db.session.add(new_order)
-        db.session.commit()  # Commit to get the order ID for later use
+        db.session.commit()
 
         # Add the items to the OrderItem table
         for item in items:

@@ -22,15 +22,7 @@
           {% endif %}
         {% endwith %}
 
-        <form method="get" class="filter-form">
-            <label for="status">Filter by Status:</label>
-            <select name="status">
-                <option value="">All</option>
-                <option value="in-transit" {% if status_filter == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
-            </select>
-            <button type="submit">Filter</button>
-        </form>
-
+        
         <form method="POST" action="{{ url_for('driver.update_order_status') }}">
             <table>
                 <thead>
@@ -51,15 +43,17 @@
                             <td>{{ order.customer_address }}</td>
                             <td>
                                 <select name="status_{{ order.order_id }}">
-                                    <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
+                                    <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>in-transit</option>
                                     <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
                                 </select>
                             </td>
                             <td class="actions">
                                 <a href="{{ url_for('driver.order_info', order_id=order.order_id) }}" class="info-button">Info</a>
+                            
                                 <form method="POST" action="{{ url_for('driver.drop_order', order_id=order.order_id) }}" style="display:inline;">
                                     <button type="submit" class="drop-button">Drop</button>
                                 </form>
+
                             </td>
                         </tr>
                         {% endif %}
@@ -70,7 +64,7 @@
             <button type="submit" class="update-button">Update Statuses</button>
         </form>
 
-        <a href="{{ url_for('driver.dashboard') }}" class="back-button">Back to Dashboard</a>
+        <a href="{{ url_for('driver.dashboard') }}" class="back-button" style="margin-top: 20px;">Back to Dashboard</a>
     </div>
 </body>
 </html>

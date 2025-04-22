@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, session, flash
 from . import driver_bp
 from models import User, OrderHistory, Delivery, OrderItem, MenuItem, db
 
-# Redirect "/" to login page
+# Redirect to login
 @driver_bp.route('/')
 def driver_home():
     return redirect(url_for('driver.driver_login'))
@@ -28,82 +28,52 @@ def driver_login():
 
 # ----------------------------------
 
-# Driver dashboard 
+# Driver dashboard
 @driver_bp.route('/dashboard')
 def dashboard():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
-
-    # Get all deliveries assigned to this driver
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
 
     total_assigned = len(deliveries)
-    pending_orders = len([d for d in deliveries if d.status == 'pending'])
     out_for_delivery_orders = len([d for d in deliveries if d.status == 'in-transit'])
-    completed_orders = len([d for d in deliveries if d.status == 'delivered'])  
+    completed_orders = len([d for d in deliveries if d.status == 'delivered'])
 
-    return render_template(
-        'driver/dashboard.html',
-        total_assigned=total_assigned,
-        pending_orders=pending_orders,
-        out_for_delivery_orders=out_for_delivery_orders,
-        completed_orders=completed_orders
-    )
+    return render_template('driver/dashboard.html',
+                           total_assigned=total_assigned,
+                           out_for_delivery_orders=out_for_delivery_orders,
+                           completed_orders=completed_orders)
 
 # ----------------------------------
 
-# View all assigned orders
+# View assigned orders
 @driver_bp.route('/orders')
 def view_orders():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
-    status_filter = request.args.get('status')
-
-    # Get all deliveries assigned to this driver
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
-    order_ids = [d.order_id for d in deliveries]
-
-    # Get all orders for those IDs
-    orders = OrderHistory.query.filter(OrderHistory.order_id.in_(order_ids)).all()
-
     combined_orders = []
-    for order in orders:
-        delivery = next((d for d in deliveries if d.order_id == order.order_id), None)
+
+    for delivery in deliveries:
+        order = OrderHistory.query.get(delivery.order_id)
         customer = User.query.get(order.customer_id)
-
-        if not customer:
-            continue
-
-        # Get all items for the order
-        order_items = OrderItem.query.filter_by(order_id=order.order_id).all()
-        item_lines = []
-        for item in order_items:
-            menu_item = MenuItem.query.get(item.item_id)
-            if menu_item:
-                item_lines.append(f"{menu_item.name} x{item.quantity}")
-        item_description = ", ".join(item_lines) if item_lines else "No Items"
-
-        # Filter for the deliver status
-        if status_filter and delivery and delivery.status != status_filter:
-            continue
 
         combined_orders.append({
             'order_id': order.order_id,
             'customer_name': customer.username,
-            'customer_address': '', #address not found?
-            'items': item_description,  
-            'status': delivery.status if delivery else 'pending'
+            'customer_address': customer.address,
+            'status': delivery.status,
         })
 
-    return render_template('driver/assigned_orders.html', orders=combined_orders, status_filter=status_filter)
+    return render_template('driver/assigned_orders.html', orders=combined_orders)
 
 # ----------------------------------
 
-# Update status of assigned orders
+# Update status
 @driver_bp.route('/orders/update', methods=['POST'])
 def update_order_status():
     if 'driver_id' not in session:
@@ -118,8 +88,15 @@ def update_order_status():
         new_status = request.form.get(key)
 
         if new_status and new_status != delivery.status:
-            delivery.status = new_status  # <-- Update Delivery table status
+            delivery.status = new_status
             updates += 1
+
+            order = OrderHistory.query.get(delivery.order_id)
+            if order:
+                if new_status == 'in-transit':
+                    order.status = 'in-transit'
+                elif new_status == 'delivered':
+                    order.status = 'delivered'
 
     if updates:
         db.session.commit()
@@ -129,16 +106,68 @@ def update_order_status():
 
     return redirect(url_for('driver.view_orders'))
 
+
+
 # ----------------------------------
 
-# View available orders to claim
+@driver_bp.route('/completed_orders')
+def completed_orders():
+    if 'driver_id' not in session:
+        return redirect(url_for('driver.driver_login'))
+
+    driver_id = session['driver_id']
+
+    # Pull only completed (delivered) deliveries
+    deliveries = Delivery.query.filter_by(driver_id=driver_id, status='delivered').all()
+    completed_orders = []
+
+    for delivery in deliveries:
+        order = OrderHistory.query.get(delivery.order_id)
+        customer = User.query.get(order.customer_id)
+
+        completed_orders.append({
+            'order_id': order.order_id,
+            'customer_name': customer.username,
+            'customer_address': customer.address,
+            'status': delivery.status
+        })
+
+    return render_template('driver/completed_orders.html', orders=completed_orders)
+
+#-----------------------------
+
+# Drop assigned order
+@driver_bp.route('/orders/drop/<int:order_id>', methods=['POST'])
+def drop_order(order_id):
+    if 'driver_id' not in session:
+        return redirect(url_for('driver.driver_login'))
+
+    driver_id = session['driver_id']
+    delivery = Delivery.query.filter_by(driver_id=driver_id, order_id=order_id).first()
+
+    if delivery:
+        db.session.delete(delivery)
+        db.session.commit()
+        flash(f"Order #{order_id} dropped successfully.")
+    else:
+        flash("No matching order found.")
+
+    return redirect(url_for('driver.view_orders'))
+
+# ----------------------------------
+
+# View available orders
 @driver_bp.route('/available')
 def available_orders():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     assigned_order_ids = [d.order_id for d in Delivery.query.all()]
-    unassigned_orders = OrderHistory.query.filter(~OrderHistory.order_id.in_(assigned_order_ids)).all()
+
+    unassigned_orders = OrderHistory.query.filter(
+        ~OrderHistory.order_id.in_(assigned_order_ids),
+        OrderHistory.status == 'completed'
+    ).all()
 
     available_orders = []
     for order in unassigned_orders:
@@ -146,8 +175,7 @@ def available_orders():
         available_orders.append({
             'order_id': order.order_id,
             'customer_name': customer.username,
-            'customer_address': customer.email,
-            'items': 'N/A',
+            'customer_address': customer.address,
             'status': order.status
         })
 
@@ -167,7 +195,7 @@ def claim_order(order_id):
         flash('Order already claimed.')
         return redirect(url_for('driver.available_orders'))
 
-    new_delivery = Delivery(driver_id=driver_id, order_id=order_id, status='pending')
+    new_delivery = Delivery(driver_id=driver_id, order_id=order_id, status='in-transit')
     db.session.add(new_delivery)
     db.session.commit()
     flash(f"Successfully claimed order #{order_id}.")
@@ -175,7 +203,32 @@ def claim_order(order_id):
 
 # ----------------------------------
 
-#Logout
+# Info page
+@driver_bp.route('/orders/<int:order_id>/info')
+def order_info(order_id):
+    if 'driver_id' not in session:
+        return redirect(url_for('driver.driver_login'))
+
+    order = OrderHistory.query.get(order_id)
+    customer = User.query.get(order.customer_id)
+    items = OrderItem.query.filter_by(order_id=order_id).all()
+
+    detailed_items = []
+    for item in items:
+        menu_item = MenuItem.query.get(item.item_id)
+        if menu_item:
+            detailed_items.append({
+                'name': menu_item.name,
+                'quantity': item.quantity,
+                'price': menu_item.price,
+                'total': menu_item.price * item.quantity
+            })
+
+    return render_template('driver/order_info.html', order=order, customer=customer, items=detailed_items)
+
+# ----------------------------------
+
+# Logout
 @driver_bp.route('/logout')
 def driver_logout():
     session.clear()

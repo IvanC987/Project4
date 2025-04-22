@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Completed Deliveries</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='driver_styles.css') }}">
+</head>
+<body>
+    <div class="orders-container">
+        <header>
+            <h1>Completed Deliveries</h1>
+            <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
+        </header>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.order_id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.customer_address }}</td>
+                    <td>{{ order.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('driver.dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

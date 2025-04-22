@@ -72,7 +72,7 @@ class OrderHistory(db.Model):
 
     status = db.Column(
         # Choose only from the ones below. Seems to be braod enough, though might add more later?
-        db.Enum('pending', 'preparing', 'completed', 'canceled'),
+        db.Enum('pending', 'preparing', 'completed', 'canceled', 'in-transit', 'delivered', name='order_status_enum'),
         default='pending',
         nullable=False
     )

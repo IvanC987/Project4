@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Completed Deliveries</title>
+    <title>Delivered Orders</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='driver_styles.css') }}">
 </head>
 <body>
     <div class="orders-container">
         <header>
-            <h1>Completed Deliveries</h1>
+            <h1>Delivered Orders</h1>
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
 
@@ -22,7 +22,7 @@
           {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('driver.update_completed_orders') }}">
+        <form method="POST" action="{{ url_for('driver.update_delivered_orders') }}">
             <table>
                 <thead>
                     <tr>
@@ -41,7 +41,7 @@
                         <td>
                             <select name="status_{{ order.order_id }}">
                                 <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
-                                <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>In Transit</option>
                             </select>
                         </td>
                     </tr>

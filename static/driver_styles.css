@@ -32,7 +32,7 @@ header h1,
     margin: 0;
 }
 
-/* LOGOUT */
+/* LOGOUT BUTTON */
 .logout-button {
     background-color: #d90429;
     color: white;
@@ -95,7 +95,16 @@ header h1,
     border: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin-bottom: 20px; /* ✨ Added to fix the overlap */
+    display: inline-block;
 }
+
+.back-button {
+    display: block;
+    margin: 30px auto 0 auto; /* push it down a bit */
+    width: fit-content;
+}
+
 
 .nav-button:hover,
 .back-button:hover,
@@ -188,4 +197,44 @@ td select:focus {
     outline: none;
     border-color: #d90429;
     box-shadow: 0 0 5px rgba(217, 4, 41, 0.3);
+}
+
+/* Updated Info and Drop buttons */
+
+.drop-button {
+    background-color: #d90429;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
+    display: inline-block;
+}
+
+.info-button {
+    background-color: #4CAF50; /* GREEN */
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100px;
+    text-align: center;
+    display: inline-block;
+}
+
+.drop-button:hover {
+    background-color: #a6021e;
+}
+
+.info-button:hover {
+    background-color: #388e3c;
 }

@@ -25,6 +25,12 @@ class User(db.Model):
         nullable=False,
     )
 
+    # Adding in new attributes
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    phone = db.Column(db.String(10), nullable=False)
+
 
 class MenuItem(db.Model):
     """
@@ -71,7 +77,7 @@ class OrderHistory(db.Model):
         nullable=False
     )
 
-    special_instructions = db.Column(db.String(500)) 
+    special_instructions = db.Column(db.String(255), nullable=True)  # Can be null
 
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
@@ -104,9 +110,16 @@ class Delivery(db.Model):
     driver_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)  # fk
     order_id = db.Column(db.Integer, db.ForeignKey('order_history.order_id'), primary_key=True)  # also fk
 
+    # status = db.Column(
+    #     db.Enum('pending', 'in-transit', 'delivered', 'canceled'),
+    #     default='pending',
+    #     nullable=False
+    # )
+
+    # Adjusted status to remove pending and canceled
     status = db.Column(
-        db.Enum('pending', 'in-transit', 'delivered', 'canceled'),
-        default='pending',
+        db.Enum('in-transit', 'delivered', name='delivery_status_enum'),
+        default='in-transit',
         nullable=False
     )
 

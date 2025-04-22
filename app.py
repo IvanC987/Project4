@@ -36,7 +36,8 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
-        return "Signup successful!"
+        return redirect(url_for('menu'))
+        # return "Signup successful!"  # Should redirect to menu instead
 
     # If GET request, just load signup html
     return render_template("customer/signup.html")

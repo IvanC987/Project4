@@ -34,7 +34,8 @@
       </ul>
       <p>Total: ${{ total }}</p>
 
-      <form action="/checkout" method="POST">
+<!--  Method should be GET not POST, otherwise it will bypass the checkout requirements (E.g. Special Instructions and other fields)-->
+      <form action="/checkout" method="GET">
         <button type="submit">Proceed to Checkout</button>
       </form>
     </div>

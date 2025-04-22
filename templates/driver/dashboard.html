@@ -28,11 +28,11 @@
                 <p>{{ total_assigned }}</p>
             </div>
             <div class="stat-card">
-                <h3>Out for Delivery</h3>
+                <h3>In-Transit</h3>
                 <p>{{ out_for_delivery_orders }}</p>
             </div>
             <div class="stat-card">
-                <h3>Completed Orders</h3>
+                <h3>Delivered Orders</h3>
                 <p>{{ completed_orders }}</p>
             </div>
         </section>
@@ -40,7 +40,7 @@
         <section class="nav-section">
             <a href="{{ url_for('driver.view_orders') }}" class="nav-button">View Assigned Orders</a>
             <a href="{{ url_for('driver.available_orders') }}" class="nav-button">View Available Orders</a>
-            <a href="{{ url_for('driver.completed_orders') }}" class="nav-button">View Completed Orders</a>
+            <a href="{{ url_for('driver.delivered_orders') }}" class="nav-button">View Delivered Orders</a>
         </section>
     </div>
 </body>

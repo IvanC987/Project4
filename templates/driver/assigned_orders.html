@@ -8,11 +8,10 @@
 <body>
     <div class="orders-container">
         <header>
-            <h1>Your Assigned Orders</h1>
+            <h1>Your Assigned Orders (In-Transit)</h1>
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
 
-        <!-- Flash messages -->
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <div class="flash">
@@ -27,9 +26,7 @@
             <label for="status">Filter by Status:</label>
             <select name="status">
                 <option value="">All</option>
-                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
                 <option value="in-transit" {% if status_filter == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
-                <option value="delivered" {% if status_filter == 'delivered' %}selected{% endif %}>Completed</option>
             </select>
             <button type="submit">Filter</button>
         </form>
@@ -39,27 +36,33 @@
                 <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>Items</th>
                         <th>Customer Name</th>
                         <th>Address</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
-                    <tr>
-                        <td>{{ order.order_id }}</td>
-                        <td>{{ order['items'] }}</td>
-                        <td>{{ order.customer_name }}</td>
-                        <td>{{ order.customer_address }}</td>
-                        <td>
-                            <select name="status_{{ order.order_id }}">
-                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
-                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Completed</option>
-                            </select>
-                        </td>
-                    </tr>
+                        {% if order.status == 'in-transit' %}
+                        <tr>
+                            <td>{{ order.order_id }}</td>
+                            <td>{{ order.customer_name }}</td>
+                            <td>{{ order.customer_address }}</td>
+                            <td>
+                                <select name="status_{{ order.order_id }}">
+                                    <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>Out for Delivery</option>
+                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                </select>
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('driver.order_info', order_id=order.order_id) }}" class="info-button">Info</a>
+                                <form method="POST" action="{{ url_for('driver.drop_order', order_id=order.order_id) }}" style="display:inline;">
+                                    <button type="submit" class="drop-button">Drop</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>

@@ -12,7 +12,6 @@
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
         
-        <!-- FLASH MESSAGE  -->
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <div class="flash">
@@ -29,10 +28,6 @@
                 <p>{{ total_assigned }}</p>
             </div>
             <div class="stat-card">
-                <h3>Pending Orders</h3>
-                <p>{{ pending_orders }}</p>
-            </div>
-            <div class="stat-card">
                 <h3>Out for Delivery</h3>
                 <p>{{ out_for_delivery_orders }}</p>
             </div>
@@ -45,6 +40,7 @@
         <section class="nav-section">
             <a href="{{ url_for('driver.view_orders') }}" class="nav-button">View Assigned Orders</a>
             <a href="{{ url_for('driver.available_orders') }}" class="nav-button">View Available Orders</a>
+            <a href="{{ url_for('driver.completed_orders') }}" class="nav-button">View Completed Orders</a>
         </section>
     </div>
 </body>

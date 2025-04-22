@@ -110,34 +110,35 @@ def update_order_status():
 
 # ----------------------------------
 
-@driver_bp.route('/completed_orders')
-def completed_orders():
+# ----------------------------------
+
+@driver_bp.route('/delivered_orders')
+def delivered_orders():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
 
-    # Pull only completed (delivered) deliveries
     deliveries = Delivery.query.filter_by(driver_id=driver_id, status='delivered').all()
-    completed_orders = []
+    delivered_orders = []
 
     for delivery in deliveries:
         order = OrderHistory.query.get(delivery.order_id)
         customer = User.query.get(order.customer_id)
 
-        completed_orders.append({
+        delivered_orders.append({
             'order_id': order.order_id,
             'customer_name': customer.username,
             'customer_address': customer.address,
             'status': delivery.status
         })
 
-    return render_template('driver/completed_orders.html', orders=completed_orders)
+    return render_template('driver/delivered_orders.html', orders=delivered_orders)
 
 #-----------------------------
 
-@driver_bp.route('/completed_orders/update', methods=['POST'])
-def update_completed_orders():
+@driver_bp.route('/delivered_orders/update', methods=['POST'])
+def update_delivered_orders():
     if 'driver_id' not in session:
         return redirect(url_for('driver.driver_login'))
 
@@ -163,11 +164,12 @@ def update_completed_orders():
 
     if updates:
         db.session.commit()
-        flash(f"Updated {updates} completed order(s).")
+        flash(f"Updated {updates} delivered order(s).")
     else:
         flash("No changes were made.")
 
-    return redirect(url_for('driver.completed_orders'))
+    return redirect(url_for('driver.delivered_orders'))
+
 
 #----------------------------------------------------
 
@@ -178,16 +180,25 @@ def drop_order(order_id):
         return redirect(url_for('driver.driver_login'))
 
     driver_id = session['driver_id']
+
     delivery = Delivery.query.filter_by(driver_id=driver_id, order_id=order_id).first()
 
     if delivery:
         db.session.delete(delivery)
+
+        order = OrderHistory.query.get(order_id)
+        if order:
+            order.status = 'completed'
+
         db.session.commit()
-        flash(f"Order #{order_id} dropped successfully.")
+        flash(f"Order #{order_id} dropped successfully and made available again.")
+
+        return redirect(url_for('driver.available_orders'))
+
     else:
         flash("No matching order found.")
+        return redirect(url_for('driver.view_orders'))
 
-    return redirect(url_for('driver.view_orders'))
 
 # ----------------------------------
 
@@ -230,11 +241,18 @@ def claim_order(order_id):
         flash('Order already claimed.')
         return redirect(url_for('driver.available_orders'))
 
+    # Create the new delivery (in-transit)
     new_delivery = Delivery(driver_id=driver_id, order_id=order_id, status='in-transit')
     db.session.add(new_delivery)
+
+    order = OrderHistory.query.get(order_id)
+    if order:
+        order.status = 'in-transit'
+
     db.session.commit()
     flash(f"Successfully claimed order #{order_id}.")
     return redirect(url_for('driver.view_orders'))
+
 
 # ----------------------------------
 

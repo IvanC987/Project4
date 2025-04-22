@@ -136,6 +136,41 @@ def completed_orders():
 
 #-----------------------------
 
+@driver_bp.route('/completed_orders/update', methods=['POST'])
+def update_completed_orders():
+    if 'driver_id' not in session:
+        return redirect(url_for('driver.driver_login'))
+
+    driver_id = session['driver_id']
+    deliveries = Delivery.query.filter_by(driver_id=driver_id, status='delivered').all()
+    updates = 0
+
+    for delivery in deliveries:
+        key = f"status_{delivery.order_id}"
+        new_status = request.form.get(key)
+
+        if new_status and new_status != delivery.status:
+            delivery.status = new_status
+            updates += 1
+
+            # Update the order history too
+            order = OrderHistory.query.get(delivery.order_id)
+            if order:
+                if new_status == 'in-transit':
+                    order.status = 'in-transit'
+                elif new_status == 'delivered':
+                    order.status = 'delivered'
+
+    if updates:
+        db.session.commit()
+        flash(f"Updated {updates} completed order(s).")
+    else:
+        flash("No changes were made.")
+
+    return redirect(url_for('driver.completed_orders'))
+
+#----------------------------------------------------
+
 # Drop assigned order
 @driver_bp.route('/orders/drop/<int:order_id>', methods=['POST'])
 def drop_order(order_id):

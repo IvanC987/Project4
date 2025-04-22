@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='driver_styles.css') }}">
+</head>
+<body>
+    <div class="orders-container">
+        <header>
+            <h1>Order #{{ order.order_id }} Details</h1>
+            <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
+        </header>
+
+        <div class="order-details">
+            <p><strong>Customer Name:</strong> {{ customer.username }}</p>
+            <p><strong>Address:</strong> {{ customer.address }}</p>
+            <p><strong>Phone:</strong> {{ customer.phone }}</p>
+            <p><strong>Special Instructions:</strong> {{ order.special_instructions if order.special_instructions else "None" }}</p>
+
+            <h2>Items:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Price (Each)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>${{ "%.2f"|format(item.total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="back-button-wrapper">
+                <a href="{{ url_for('driver.view_orders') }}" class="back-button">Back to Assigned Orders</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

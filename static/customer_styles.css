@@ -356,6 +356,12 @@ input:focus {
   text-decoration: none;
 }
 
+.form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* responsive media queries */
 @media (max-width: 768px) {
   .dashboard-container {
@@ -363,3 +369,4 @@ input:focus {
     align-items: center;
   }
 }
+

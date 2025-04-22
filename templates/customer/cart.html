@@ -11,9 +11,6 @@
   <body>
     <header>
       <nav class="navbar">
-        <div class="nav-logo">
-          <!-- <img src="/static/images/logo.png" alt="logo" /> -->
-        </div>
         <ul class="nav-links">
           <li><a href="menu">Menu</a></li>
           <li>
@@ -36,7 +33,11 @@
         {% endfor %}
       </ul>
       <p>Total: ${{ total }}</p>
-      <a href="/checkout"><button>Proceed to Checkout</button></a>
+
+<!--  Method should be GET not POST, otherwise it will bypass the checkout requirements (E.g. Special Instructions and other fields)-->
+      <form action="/checkout" method="GET">
+        <button type="submit">Proceed to Checkout</button>
+      </form>
     </div>
 
     <script>

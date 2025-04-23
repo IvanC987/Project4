@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>Flask Webpage</title>
+    <!-- link to external css stylesheet -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -9,12 +10,15 @@
     />
   </head>
   <body>
+    <!-- logo section -->
     <div class="logo">
       <img src="/static/images/logo.png" alt="The Rusty Skillet Logo" />
     </div>
+    <!-- main content container -->
     <div class="container">
       <h1>Welcome to The Rusty Skillet!</h1>
       <br /><br />
+      <!-- button to navigate to signup page -->
       <a href="{{ url_for('signup') }}" class="get-started-btn">Get Started</a>
     </div>
   </body>

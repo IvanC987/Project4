@@ -3,6 +3,7 @@ from config import Config
 from admin import admin_bp
 from driver import driver_bp
 from models import User, MenuItem, OrderHistory, db, OrderItem
+from collections import defaultdict
 
 app = Flask(__name__)  # Create flask app instance
 app.config.from_object(Config)  # Configures the instance based on the Config class in config.py
@@ -67,7 +68,18 @@ def login():  # Very similar to signup
 def menu():
     # Get only available items
     available_items = MenuItem.query.filter_by(is_available=True).all()
-    return render_template('customer/menu.html', menu=available_items)
+    
+    menu_by_category = defaultdict(list)
+    for item in available_items:
+        menu_by_category[item.category].append(item)
+        
+    menu_layout = ['Appetizer', 'Salad', 'Entree', 'Barbecue', 'Seafood', 'Side', 'Dessert', 'Drink']
+    
+    all_categories = set(menu_by_category.keys())
+    other_categories = all_categories - set(menu_layout)
+    sorted_categories = menu_layout + sorted(other_categories)
+    
+    return render_template('customer/menu.html', menu=menu_by_category, category_order=sorted_categories)
 
 
 # Only available as a POST method since we're adding items to cart

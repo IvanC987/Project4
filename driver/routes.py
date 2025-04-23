@@ -71,7 +71,9 @@ def view_orders():
 
     return render_template('driver/assigned_orders.html', orders=combined_orders)
 
+
 # ----------------------------------
+
 
 # Update status
 @driver_bp.route('/orders/update', methods=['POST'])
@@ -83,15 +85,10 @@ def update_order_status():
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
     updates = 0
 
-    print("--------------")
-    print("made available again")
     for delivery in deliveries:
-        print(delivery)
         key = f"status_{delivery.order_id}"
         new_status = request.form.get(key)
 
-        print(delivery.status, new_status)
-        print("")
         if new_status and new_status != delivery.status:
             delivery.status = new_status
             updates += 1
@@ -102,7 +99,6 @@ def update_order_status():
                     order.status = 'in-transit'
                 elif new_status == 'delivered':
                     order.status = 'delivered'
-    print("--------------")
 
     if updates:
         db.session.commit()
@@ -116,7 +112,6 @@ def update_order_status():
 
 # ----------------------------------
 
-# ----------------------------------
 
 @driver_bp.route('/delivered_orders')
 def delivered_orders():
@@ -141,7 +136,9 @@ def delivered_orders():
 
     return render_template('driver/delivered_orders.html', orders=delivered_orders)
 
+
 #-----------------------------
+
 
 @driver_bp.route('/delivered_orders/update', methods=['POST'])
 def update_delivered_orders():
@@ -179,6 +176,7 @@ def update_delivered_orders():
 
 #----------------------------------------------------
 
+
 # Drop assigned order
 @driver_bp.route('/orders/drop/<int:order_id>', methods=['POST'])
 def drop_order(order_id):
@@ -208,6 +206,7 @@ def drop_order(order_id):
 
 # ----------------------------------
 
+
 # View available orders
 @driver_bp.route('/available')
 def available_orders():
@@ -233,7 +232,9 @@ def available_orders():
 
     return render_template('driver/available_orders.html', orders=available_orders)
 
+
 # ----------------------------------
+
 
 # Claim an available order
 @driver_bp.route('/claim/<int:order_id>', methods=['POST'])
@@ -262,6 +263,7 @@ def claim_order(order_id):
 
 # ----------------------------------
 
+
 # Info page
 @driver_bp.route('/orders/<int:order_id>/info')
 def order_info(order_id):
@@ -285,7 +287,9 @@ def order_info(order_id):
 
     return render_template('driver/order_info.html', order=order, customer=customer, items=detailed_items)
 
+
 # ----------------------------------
+
 
 # Logout
 @driver_bp.route('/logout')

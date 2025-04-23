@@ -64,7 +64,7 @@ def view_orders():
 
         combined_orders.append({
             'order_id': order.order_id,
-            'customer_name': customer.username,
+            'customer_name': customer.first_name + " " + customer.last_name,
             'customer_address': customer.address,
             'status': delivery.status,
         })
@@ -83,10 +83,15 @@ def update_order_status():
     deliveries = Delivery.query.filter_by(driver_id=driver_id).all()
     updates = 0
 
+    print("--------------")
+    print("made available again")
     for delivery in deliveries:
+        print(delivery)
         key = f"status_{delivery.order_id}"
         new_status = request.form.get(key)
 
+        print(delivery.status, new_status)
+        print("")
         if new_status and new_status != delivery.status:
             delivery.status = new_status
             updates += 1
@@ -97,6 +102,7 @@ def update_order_status():
                     order.status = 'in-transit'
                 elif new_status == 'delivered':
                     order.status = 'delivered'
+    print("--------------")
 
     if updates:
         db.session.commit()
@@ -128,7 +134,7 @@ def delivered_orders():
 
         delivered_orders.append({
             'order_id': order.order_id,
-            'customer_name': customer.username,
+            'customer_name': customer.first_name + " " + customer.last_name,
             'customer_address': customer.address,
             'status': delivery.status
         })
@@ -220,7 +226,7 @@ def available_orders():
         customer = User.query.get(order.customer_id)
         available_orders.append({
             'order_id': order.order_id,
-            'customer_name': customer.username,
+            'customer_name': customer.first_name + " " + customer.last_name,
             'customer_address': customer.address,
             'status': order.status
         })

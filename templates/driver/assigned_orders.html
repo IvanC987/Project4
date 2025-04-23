@@ -23,7 +23,7 @@
         {% endwith %}
 
         
-        <form method="POST" action="{{ url_for('driver.update_order_status') }}">
+
             <table>
                 <thead>
                     <tr>
@@ -49,7 +49,7 @@
                             </td>
                             <td class="actions">
                                 <a href="{{ url_for('driver.order_info', order_id=order.order_id) }}" class="info-button">Info</a>
-                            
+
                                 <form method="POST" action="{{ url_for('driver.drop_order', order_id=order.order_id) }}" style="display:inline;">
                                     <button type="submit" class="drop-button">Drop</button>
                                 </form>
@@ -60,7 +60,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-
+        <form method="POST" action="{{ url_for('driver.update_order_status') }}">
             <button type="submit" class="update-button">Update Statuses</button>
         </form>
 

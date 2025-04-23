@@ -2,11 +2,13 @@
 <html lang="en">
   <head>
     <title>User Login</title>
+    <!-- link to external css file -->
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
+    <!-- inline style for error message box -->
     <style>
       .error-message {
         background-color: #f8d7da;
@@ -26,11 +28,15 @@
     </style>
   </head>
   <body class="login">
+    <!-- logo image at the top -->
     <div class="logo">
       <img src="/static/images/logo.png" alt="brand logo" />
     </div>
+
+    <!-- login heading -->
     <h1>User Login</h1>
 
+    <!-- display flashed error messages if any -->
     {% with messages = get_flashed_messages() %} {% if messages %}
     <div class="error-message">
       {% for message in messages %}
@@ -39,15 +45,20 @@
     </div>
     {% endif %} {% endwith %}
 
+    <!-- login form -->
     <form action="{{ url_for('login') }}" method="POST">
+      <!-- username input -->
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required /><br />
 
+      <!-- password input -->
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required /><br />
+
+      <!-- login button -->
       <button type="submit">Log In</button>
     </form>
+    <!-- signup link for users without an account -->
     <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
   </body>
 </html>
-

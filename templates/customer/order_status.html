@@ -17,6 +17,7 @@
         border-radius: 10px;
       }
 
+      /* individual order card */
       .order-card {
         background: white;
         border-radius: 10px;
@@ -26,10 +27,12 @@
         transition: transform 0.2s;
       }
 
+      /* hover effect for cards */
       .order-card:hover {
         transform: scale(1.02);
       }
 
+      /* header of each order card */
       .order-header {
         display: flex;
         flex-direction: column;
@@ -38,16 +41,19 @@
         margin-bottom: 0.5rem;
       }
 
+      /* body of each order card */
       .order-body {
         font-size: 0.95rem;
       }
 
+      /* message if there are no orders */
       .no-orders {
         text-align: center;
         font-style: italic;
         color: gray;
       }
 
+      /* layout for multiple order cards */
       .order-grid {
         display: flex;
         flex-wrap: wrap;
@@ -55,12 +61,14 @@
         justify-content: center;
       }
 
+      /* responsive layout for order cards (3 per row) */
       .order-card {
-        flex: 1 1 calc(33.333% - 1rem); /* 3 per row with spacing */
+        flex: 1 1 calc(33.333% - 1rem);
         box-sizing: border-box;
         margin: 0.5rem 0;
       }
 
+      /* container for refresh button */
       .refresh-container {
         display: flex;
         justify-content: flex-end;
@@ -69,6 +77,7 @@
     </style>
   </head>
   <body>
+    <!-- site header with navigation menu -->
     <header>
       <nav class="navbar">
         <ul class="nav-links">
@@ -81,6 +90,7 @@
     </header>
     <br /><br /><br />
     <div class="order-status">
+      <!-- refresh button for reloading the page -->
       <div class="refresh-container">
         <button class="refresh-button" onclick="location.reload();">
           ⟳ Refresh
@@ -88,8 +98,10 @@
       </div>
       <h1>Your Order Status</h1>
 
+      <!-- check if there are any orders -->
       {% if orders %}
       <div class="order-grid">
+        <!-- loop through each order and display in a card -->
         {% for order in orders %}
         <div class="order-card">
           <div class="order-header">
@@ -103,9 +115,9 @@
         {% endfor %}
       </div>
       {% else %}
+      <!-- message when no orders are found -->
       <p class="no-orders">No orders found.</p>
       {% endif %}
     </div>
   </body>
 </html>
-

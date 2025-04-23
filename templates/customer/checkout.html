@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>Flask Webpage</title>
+    <!-- link to external css stylesheet -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -9,6 +10,7 @@
     />
   </head>
   <body>
+    <!-- header with navigation bar -->
     <header>
       <nav class="navbar">
         <ul class="nav-links">
@@ -21,18 +23,21 @@
         </ul>
       </nav>
     </header>
+
+    <!-- checkout section -->
     <div class="checkout">
       <h1>Checkout</h1>
+      <!-- form for user checkout details -->
       <form action="/checkout" method="POST">
+        <!-- user name, address, and phone number input -->
         <label>Name:</label>
         <input type="text" name="name" required /><br />
-
         <label>Address:</label>
         <input type="text" name="address" required /><br />
-
         <label>Phone:</label>
         <input type="text" name="phone" required /><br />
 
+        <!-- special instructions textarea -->
         <div class="form-group">
           <label for="instructions">Special Instructions:</label>
           <textarea
@@ -45,9 +50,9 @@
           ></textarea>
         </div>
 
+        <!-- submit button to place the order -->
         <button type="submit">Place Order</button>
       </form>
     </div>
   </body>
 </html>
-

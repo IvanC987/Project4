@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Flask Webpage</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='customer_styles.css') }}"
+    />
+    <style>
+      .menu-container {
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .category-column {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
+      }
+
+      .category-column h2 {
+        text-align: center;
+        color: #926851;
+      }
+
+      .category-column ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .category-column li {
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1.2rem;
+      }
+
+      .category-column button {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <ul class="nav-links">
+          <li><a href="menu">Menu</a></li>
+          <li><a href="order_status">Order Status</a></li>
+          <li><a href="cart">Cart</a></li>
+          <li><a href="checkout">Checkout</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <br /><br /><br />
+    <div class="menu">
+      <div class="logo">
+        <img src="/static/images/logo.png" alt="brand logo" />
+      </div>
+      <h1>Menu</h1>
+
+      <div class="menu-container">
+        {% for category in category_order %}
+        {% if category in menu %}
+        <div class="category-column">
+          <h2>{{ category.capitalize() }}</h2>
+          <ul>
+            {% for item in menu[category] %}
+            <li>
+              <strong>{{ item.name }}</strong> - ${{ item.price }}<br />
+              {{ item.description }}<br />
+              <button onclick="addToCart({{ item.item_id }})">
+                Add to Cart
+              </button>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <script>
+      function addToCart(itemId) {
+        fetch("/add_to_cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ item_id: itemId }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert(data.message); 
+          });
+      }
+    </script>
+  </body>
+</html>
+

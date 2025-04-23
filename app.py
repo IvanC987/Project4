@@ -37,8 +37,9 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
+        # redirects to menu
         return redirect(url_for('menu'))
-        # return "Signup successful!"  # Should redirect to menu instead
+        
 
     # If GET request, just load signup html
     return render_template("customer/signup.html")
@@ -91,7 +92,7 @@ def add_to_cart():
     data = request.get_json()
     item_id = data.get('item_id')
 
-    # Optional: check if item exists in database before adding
+    # Check if item exists in database
     item = MenuItem.query.get(item_id)
     if item:
         session['cart'].append(item_id)
@@ -105,7 +106,7 @@ def add_to_cart():
 def view_cart():
     cart_ids = session.get('cart', [])
 
-    # If you're storing duplicates for quantity, count them
+    # Count duplicates (for quantities)
     from collections import Counter
     cart_count = Counter(cart_ids)
 
@@ -152,7 +153,7 @@ def checkout():
 
     user_id = session['user_id']  # Get the user ID from session
     if request.method == 'POST':
-        # Capture the form data for checkout (e.g., name, address, phone)
+        # Capture the form data for checkout
         name = request.form.get('name')
         address = request.form.get('address')
         phone = request.form.get('phone')

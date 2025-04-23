@@ -2,54 +2,92 @@
 <html lang="en">
   <head>
     <title>Flask Webpage</title>
-    <!-- link to external stylesheet for customer styles -->
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
+    <style>
+      .menu-container {
+        display: flex;
+        gap: 40px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .category-column {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
+      }
+
+      .category-column h2 {
+        text-align: center;
+        color: #926851;
+      }
+
+      .category-column ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      .category-column li {
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1.2rem;
+      }
+
+      .category-column button {
+        margin-top: 10px;
+      }
+    </style>
   </head>
   <body>
-    <!-- site header with navigation menu -->
     <header>
       <nav class="navbar">
         <ul class="nav-links">
-          <!-- links to different sections/pages -->
           <li><a href="menu">Menu</a></li>
-          <li>
-            <a href="order_status">Order Status</a>
-          </li>
+          <li><a href="order_status">Order Status</a></li>
           <li><a href="cart">Cart</a></li>
           <li><a href="checkout">Checkout</a></li>
         </ul>
       </nav>
     </header>
+
     <br /><br /><br />
-    <!-- menu section with items to display -->
     <div class="menu">
       <div class="logo">
         <img src="/static/images/logo.png" alt="brand logo" />
       </div>
       <h1>Menu</h1>
-      <!-- loop through menu items and display each one -->
-      <ul>
-        {% for item in menu %}
-        <li>
-          <!-- display item name and price -->
-          <strong>{{ item.name }}</strong> - ${{ item.price }}<br />
-          <!-- display item description -->
-          {{ item.description }}<br />
-          <!-- button to add item to cart -->
-          <button onclick="addToCart({{ item.item_id }})">Add to Cart</button>
-        </li>
+
+      <div class="menu-container">
+        {% for category in category_order %}
+        {% if category in menu %}
+        <div class="category-column">
+          <h2>{{ category.capitalize() }}</h2>
+          <ul>
+            {% for item in menu[category] %}
+            <li>
+              <strong>{{ item.name }}</strong> - ${{ item.price }}<br />
+              {{ item.description }}<br />
+              <button onclick="addToCart({{ item.item_id }})">
+                Add to Cart
+              </button>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
         {% endfor %}
-      </ul>
+      </div>
     </div>
 
-    <!-- javascript function to handle adding items to the cart -->
     <script>
       function addToCart(itemId) {
-        // send post request to add item to cart
         fetch("/add_to_cart", {
           method: "POST",
           headers: {
@@ -59,10 +97,10 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            // show a confirmation alert with the message from server
-            alert(data.message);
+            alert(data.message); 
           });
       }
     </script>
   </body>
 </html>
+

@@ -81,6 +81,9 @@ class OrderHistory(db.Model):
 
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
+    # Adding relationship between order and user for admin info
+    user = db.relationship('User', backref='orders')
+
 
 class OrderItem(db.Model):
     """

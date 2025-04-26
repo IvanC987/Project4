@@ -76,8 +76,33 @@ def manage_orders():
 
         return redirect(url_for('admin.manage_orders'))
 
+    # query grabs the values for order_id, username, firstname and lastname. Defaults to '' if not provided, which grabs all
+    query = request.args.get('q', '').strip()
 
-    orders = OrderHistory.query.all()
+    # Status is if user specified an order status, defaults to '' if none is provided (returns all orders, unless query)
+    status_filter = request.args.get('status', '').strip()
+
+    # Joins the two tables based on user_id fk and orders them by time (Oldest order first, having higher priority)
+    orders = OrderHistory.query.join(User).order_by(OrderHistory.timestamp.asc())
+
+    # Filter by order status
+    if status_filter:
+        orders = orders.filter(OrderHistory.status == status_filter)
+
+    # Perform text search, though it can be ambiguous at the moment since they're all added together...hmmm...
+    # Though it's exact values. Should be fine (?)
+    if query:
+        orders = orders.filter(
+            db.or_(
+                db.cast(OrderHistory.order_id, db.String) == query,
+                User.username == query,
+                User.first_name == query,
+                User.last_name == query
+            )
+        )
+
+    # Grab all orders and return that along with a user_map. Basically a dict, user_id being key, username as value
+    orders = orders.all()
     users = User.query.with_entities(User.id, User.username).all()
     user_map = {user.id: user.username for user in users}
 

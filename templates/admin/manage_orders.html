@@ -11,7 +11,19 @@
             <h1>Manage Orders</h1>
             <a href="{{ url_for('admin.dashboard') }}" class="logout-button">⬅ Back to Dashboard</a>
         </header>
-<p>Orders count: {{ orders | length }}</p>
+        <p>Orders count: {{ orders | length }}</p>
+        <form method="get" action="{{ url_for('admin.manage_orders') }}">
+            <label for="status">Filter by Status:</label>
+                <select name="status">
+                    <option value="">All</option>
+                    <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="preparing" {% if filter_status == 'preparing' %}selected{% endif %}>Preparing</option>
+                    <option value="completed" {% if filter_status == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="canceled" {% if filter_status == 'canceled' %}selected{% endif %}>Canceled</option>
+                </select>
+            <input type="text" name="q" placeholder="Search ID, Username, First/Last name" value="{{ query or '' }}">
+            <button type="submit">Apply</button>
+        </form>
 
         <section>
             {% if orders %}
@@ -20,8 +32,9 @@
                         <thead>
                             <tr>
                                 <th>Order ID</th>
-                                <th>Customer ID</th>
-                                <th>Customer Username</th>
+                                <th>Username</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
                                 <th>Status</th>
                                 <th>Total</th>
                                 <th>Timestamp</th>
@@ -31,15 +44,21 @@
                             {% for order in orders %}
                             <tr>
                                 <td>{{ order.order_id }}</td>
-                                <td>{{ order.customer_id }}</td>
-                                <td>{{ user_map[order.customer_id] }}</td>
+                                <td>{{ order.user.username }}</td>
+                                <td>{{ order.user.first_name }}</td>
+                                <td>{{ order.user.last_name }}</td>
                                 <td>
-                                    <select name="status_{{ order.order_id }}">
-                                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
-                                        <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
-                                        <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
-                                        <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
-                                    </select>
+                                    {% if order.status in ['in-transit', 'delivered'] %}
+                                        <!-- Show status as plain text if not editable -->
+                                        <strong>{{ order.status.capitalize() }}</strong>
+                                    {% else %}
+                                        <select name="status_{{ order.order_id }}">
+                                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                            <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>Preparing</option>
+                                            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                                            <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                        </select>
+                                    {% endif %}
                                 </td>
                                 <td>${{ order.total_price }}</td>
                                 <td>{{ order.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>

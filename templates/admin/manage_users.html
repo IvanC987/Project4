@@ -12,49 +12,50 @@
             <a href="{{ url_for('admin.dashboard') }}" class="logout-button">⬅ Back to Dashboard</a>
         </header>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">
-              {% for msg in messages %}
-                <p>{{ msg }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        {% include "components/_flash.html" %}
 
+        <!-- Search form -->
         <form method="GET" action="{{ url_for('admin.manage_users') }}" style="margin-bottom: 20px;">
             <input type="text" name="q" placeholder="Search by username or email" value="{{ request.args.get('q', '') }}">
             <button type="submit">Search</button>
         </form>
 
-        <table class="orders-table">
-            <thead>
-                <tr>
-                    <th>User ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.role }}</td>
-                    <td>
-                        {% if user.role != 'admin' %}
-                        <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" onclick="return confirm('Delete this user?')">Delete</a>
-                        {% else %}
-                        <span style="color: gray;">Protected</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Update status form -->
+        <form method="POST" action="{{ url_for('admin.update_user_status') }}">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            {% if user.role != 'admin' or current_user_is_owner %}
+                                <select name="is_active_{{ user.id }}">
+                                    <option value="True" {% if user.is_active %}selected{% endif %}>Active</option>
+                                    <option value="False" {% if not user.is_active %}selected{% endif %}>Inactive</option>
+                                </select>
+                            {% else %}
+                                <span style="color: gray;">Protected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <button type="submit" style="margin-top: 20px;">Apply Changes</button>
+        </form>
     </div>
 </body>
 </html>

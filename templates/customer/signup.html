@@ -7,7 +7,6 @@
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
-    <!-- custom style for error message box -->
     <style>
       .error-message {
         background-color: #f8d7da;
@@ -30,16 +29,9 @@
     <div class="logo">
       <img src="/static/images/logo.png" alt="brand logo" />
     </div>
+    {% include "components/_flash.html" %}
     <h1>User Signup</h1>
-    <!-- display flash messages if any -->
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <div class="error-message">
-      {% for message in messages %}
-      <p>{{ message }}</p>
-      {% endfor %}
-    </div>
-    {% endif %} {% endwith %}
-    <!-- signup form -->
+
     <form action="{{ url_for('signup') }}" method="POST">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required /><br />
@@ -50,9 +42,21 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required /><br />
 
+      <label for="first_name">First Name:</label>
+      <input type="text" id="first_name" name="first_name" required /><br />
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" id="last_name" name="last_name" required /><br />
+
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" name="phone" maxlength="10" pattern="\d{10}" required title="Phone number must be 10 digits">
+
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required /><br />
+
       <button type="submit">Sign Up</button>
     </form>
-    <!-- link to login page -->
+
     <p>Already have an account? <a href="{{ url_for('login') }}">Log In</a></p>
   </body>
 </html>

@@ -11,60 +11,55 @@
             <h1>Your Assigned Orders (In-Transit)</h1>
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
-
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">
-              {% for message in messages %}
-                <p>{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer Name</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        {% if order.status == 'in-transit' %}
-                        <tr>
-                            <td>{{ order.order_id }}</td>
-                            <td>{{ order.customer_name }}</td>
-                            <td>{{ order.customer_address }}</td>
-                            <td>
-                                <select name="status_{{ order.order_id }}">
-                                    <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>in-transit</option>
-                                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
-                                </select>
-                            </td>
-                            <td class="actions">
-                                <a href="{{ url_for('driver.order_info', order_id=order.order_id) }}" class="info-button">Info</a>
-
-                                <form method="POST" action="{{ url_for('driver.drop_order', order_id=order.order_id) }}" style="display:inline;">
-                                    <button type="submit" class="drop-button">Drop</button>
-                                </form>
-
-                            </td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
+        {% include "components/_flash.html" %}
         <form method="POST" action="{{ url_for('driver.update_order_status') }}">
-            <button type="submit" class="update-button">Update Statuses</button>
-        </form>
+          <table>
+              <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
+            <tbody>
+              {% for order in orders %}
+                {% if order.status == 'in-transit' %}
+                <tr>
+                  <td>{{ order.order_id }}</td>
+                  <td>{{ order.customer_name }}</td>
+                  <td>{{ order.customer_address }}</td>
+                  <td>
+                    <select name="status_{{ order.order_id }}">
+                      <option value="in-transit" {% if order.status == 'in-transit' %}selected{% endif %}>in-transit</option>
+                      <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                    </select>
+                  </td>
+                  <td class="actions">
+                    <a href="{{ url_for('driver.order_info', order_id=order.order_id) }}" class="info-button">Info</a>
+                    <button type="button" class="drop-button" onclick="submitDrop({{ order.order_id }})">Drop</button>
+                  </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="submit" class="update-button">Update Statuses</button>
+        </form>
         <a href="{{ url_for('driver.dashboard') }}" class="back-button" style="margin-top: 20px;">Back to Dashboard</a>
     </div>
+
+    <script>
+      function submitDrop(orderId) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = `/driver/orders/drop/${orderId}`;
+        document.body.appendChild(form);
+        form.submit();
+      }
+    </script>
+
 </body>
 </html>

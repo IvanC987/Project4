@@ -12,15 +12,7 @@
             <a href="{{ url_for('driver.driver_logout') }}" class="logout-button">Logout</a>
         </header>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">
-              {% for message in messages %}
-                <p>{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        {% include "components/_flash.html" %}
 
         <form method="POST" action="{{ url_for('driver.update_delivered_orders') }}">
             <table>

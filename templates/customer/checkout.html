@@ -1,43 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Flask Webpage</title>
-    <!-- link to external css stylesheet -->
+    <title>Checkout</title>
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
+    <style>
+      .checkout-summary {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .checkout-summary h2 {
+        color: #605651;
+        margin-bottom: 10px;
+      }
+      .checkout-summary .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .checkout-summary .total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-top: 10px;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+      }
+    </style>
   </head>
   <body>
-    <!-- header with navigation bar -->
     <header>
       <nav class="navbar">
         <ul class="nav-links">
           <li><a href="menu">Menu</a></li>
-          <li>
-            <a href="order_status">Order Status</a>
-          </li>
+          <li><a href="order_status">Order Status</a></li>
           <li><a href="cart">Cart</a></li>
           <li><a href="checkout">Checkout</a></li>
         </ul>
       </nav>
     </header>
+    <br /><br /><br />
 
-    <!-- checkout section -->
     <div class="checkout">
       <h1>Checkout</h1>
-      <!-- form for user checkout details -->
-      <form action="/checkout" method="POST">
-        <!-- user name, address, and phone number input -->
-        <label>Name:</label>
-        <input type="text" name="name" required /><br />
-        <label>Address:</label>
-        <input type="text" name="address" required /><br />
-        <label>Phone:</label>
-        <input type="text" name="phone" required /><br />
 
-        <!-- special instructions textarea -->
+      <form action="/checkout" method="POST" id="checkoutForm">
+        <!-- Special Instructions -->
         <div class="form-group">
           <label for="instructions">Special Instructions:</label>
           <textarea
@@ -50,9 +65,54 @@
           ></textarea>
         </div>
 
-        <!-- submit button to place the order -->
-        <button type="submit">Place Order</button>
+        <!-- Order Summary -->
+        <div class="checkout-summary">
+          <h2>Order Summary</h2>
+
+          <div class="row">
+            <span>Subtotal:</span>
+            <span>${{ total }}</span>
+          </div>
+
+          <div class="row">
+            <span>Tax (7%):</span>
+            <span>${{ "%.2f"|format(total * 0.07) }}</span>
+          </div>
+
+          <div class="row">
+            <label for="tip">Tip:</label>
+            <select name="tip" id="tip" onchange="updateTotal()">
+              <option value="0">No Tip</option>
+              <option value="0.05">5%</option>
+              <option value="0.10">10%</option>
+              <option value="0.15">15%</option>
+              <option value="0.20">20%</option>
+            </select>
+          </div>
+
+          <div class="row total">
+            <span>Total:</span>
+            <span id="finalTotal">${{ "%.2f"|format(total * 1.07) }}</span>
+          </div>
+        </div>
+
+        <button type="submit" style="margin-top: 20px;">Place Order</button>
       </form>
     </div>
+
+    <script>
+      const baseTotal = {{ "%.2f"|format(total) }};
+      const tax = baseTotal * 0.07;
+
+      function updateTotal() {
+        const tipSelect = document.getElementById("tip");
+        const tipPercent = parseFloat(tipSelect.value);
+        const tipAmount = baseTotal * tipPercent;
+        const finalAmount = baseTotal + tax + tipAmount;
+
+        document.getElementById("finalTotal").innerText =
+          "$" + finalAmount.toFixed(2);
+      }
+    </script>
   </body>
 </html>

@@ -1,9 +1,11 @@
+import hashlib
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from config import Config
 from admin import admin_bp
 from driver import driver_bp
 from models import User, MenuItem, OrderHistory, db, OrderItem
-from collections import defaultdict
+from collections import defaultdict, Counter
+
 
 app = Flask(__name__)  # Create flask app instance
 app.config.from_object(Config)  # Configures the instance based on the Config class in config.py
@@ -25,17 +27,28 @@ def signup():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+
 
         # A simple check for dedup of whether a user already exist with that email/username
         existing_user = User.query.filter((User.email == email) | (User.username == username)).first()
         if existing_user:
-            flash("User already exists with that email or username.")
+            flash("User already exists with that email or username.", "error")
             return redirect(url_for('signup'))
 
-        # Else, add this new user to DB
-        new_user = User(username=username, email=email, password=password, role="customer")
+        # Else, add this new user to DB after hashing password (64 hexidecimal chars)
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        new_user = User(username=username, email=email, password=hashed_password, first_name=first_name,
+                        last_name=last_name, phone=phone, address=address, role="customer")
         db.session.add(new_user)
         db.session.commit()
+
+        # Bug: Forgot to set session info before
+        session['user_id'] = new_user.id
+        session['username'] = new_user.username
 
         # redirects to menu
         return redirect(url_for('menu'))
@@ -48,18 +61,23 @@ def signup():
 @app.route("/login", methods=['GET', 'POST'])
 def login():  # Very similar to signup
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        identifier = request.form.get('username_or_email').strip()
+        password = request.form.get('password').strip()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter((User.username == identifier) | (User.email == identifier)).first()
 
-        if user and user.password == password:
+        if user and user.password == hashed_password and user.role == "customer":
+            if not user.is_active:
+                flash("Account is inactive. Contact admin.", "error")
+                return redirect(url_for('login'))
+
             session['user_id'] = user.id
             session['username'] = user.username
 
             return redirect(url_for('menu'))
 
-        flash("Invalid credentials, please try again.")
+        flash("Invalid credentials, please try again.", "error")
 
     return render_template("customer/login.html")
 
@@ -107,7 +125,6 @@ def view_cart():
     cart_ids = session.get('cart', [])
 
     # Count duplicates (for quantities)
-    from collections import Counter
     cart_count = Counter(cart_ids)
 
     # Get all unique item objects
@@ -151,34 +168,34 @@ def checkout():
     if 'user_id' not in session:  # Ensure user is logged in
         return redirect(url_for('login'))
 
+
     user_id = session['user_id']  # Get the user ID from session
     if request.method == 'POST':
         # Capture the form data for checkout
-        name = request.form.get('name')
-        address = request.form.get('address')
-        phone = request.form.get('phone')
-        instructions = request.form.get('instructions')  
-
+        instructions = request.form.get('instructions')
+        tip_percent = float(request.form.get('tip', 0))
 
         # Check if cart exists in session
         if 'cart' not in session:
-            flash("Your cart is empty!")
+            flash("Your cart is empty!", "error")
             return redirect(url_for('menu'))  # Redirect to menu if cart is empty
 
         cart_ids = session.get('cart', [])
 
         # Get the list of menu items based on cart item IDs
-        from collections import Counter
         cart_count = Counter(cart_ids)
         items = MenuItem.query.filter(MenuItem.item_id.in_(cart_count.keys())).all()
 
         # Calculate the total price
-        total_price = sum(item.price * cart_count[item.item_id] for item in items)
+        subtotal = sum(item.price * cart_count[item.item_id] for item in items)
+        tax = subtotal * 0.07
+        tip = subtotal * tip_percent
+        total_price = subtotal + tax + tip
 
         # Create a new order in the OrderHistory table
         new_order = OrderHistory(
             customer_id=user_id,
-            total_price=total_price,
+            total_price=round(total_price, 2),
             status='pending',
             special_instructions=instructions 
         )
@@ -196,10 +213,17 @@ def checkout():
         # Clear the cart after placing the order
         session.pop('cart', None)
 
-        flash("Order placed successfully!")
+        flash("Order placed successfully!", "success")
         return redirect(url_for('order_status'))  # Redirect to the order status page
 
-    return render_template("customer/checkout.html")
+
+    # If GET: show form and compute total
+    cart_ids = session.get('cart', [])
+    cart_count = Counter(cart_ids)
+    items = MenuItem.query.filter(MenuItem.item_id.in_(cart_count.keys())).all()
+    total = sum(item.price * cart_count[item.item_id] for item in items)
+
+    return render_template("customer/checkout.html", total=round(total, 2))
 
 
 @app.route("/order_status")

@@ -2,36 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Admin or Driver</title>
+    <title>Create Users</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_styles.css') }}">
 </head>
 <body>
     <div class="admin-container">
         <header>
-            <h1>Create Admin / Driver</h1>
+            <h1>Create Users</h1>
             <a href="{{ url_for('admin.dashboard') }}" class="logout-button">⬅ Back to Dashboard</a>
         </header>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="flash">
-              {% for msg in messages %}
-                <p>{{ msg }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        {% include "components/_flash.html" %}
 
         <form method="POST" action="{{ url_for('admin.create_users') }}">
             <input type="text" name="username" placeholder="Username" required>
             <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
+
+            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="last_name" placeholder="Last Name" required>
+            <input type="text" name="phone" placeholder="Phone Number" maxlength="10" pattern="\d{10}" title="Phone number must be 10 digits" required>
+            <input type="text" name="address" placeholder="Address" required>
+
             <select name="role" required>
                 <option value="">Select Role</option>
-                <option value="admin">Admin</option>
+                <option value="admin" {% if not is_owner %}disabled{% endif %}>Admin</option>
                 <option value="driver">Driver</option>
                 <option value="customer">Customer</option>
             </select>
+
             <button type="submit">Create Account</button>
         </form>
     </div>

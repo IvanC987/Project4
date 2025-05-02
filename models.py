@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from flask_sqlalchemy import SQLAlchemy
+
 
 db = SQLAlchemy()
 
@@ -17,20 +19,21 @@ class User(db.Model):
     roll- Role of the user. Currently have "customer", "delivery", "admin" atm
     """
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(50), nullable=False)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(64), unique=True, nullable=False)
+    password = db.Column(db.String(64), nullable=False)
     role = db.Column(
         db.Enum('customer', 'admin', 'driver', name='user_role_enum'),
         nullable=False,
     )
 
     # Adding in new attributes
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
+    first_name = db.Column(db.String(64), nullable=False)
+    last_name = db.Column(db.String(64), nullable=False)
     address = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(10), nullable=False)
-
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    is_owner = db.Column(db.Boolean, default=False, nullable=False)
 
 class MenuItem(db.Model):
     """
@@ -79,7 +82,7 @@ class OrderHistory(db.Model):
 
     special_instructions = db.Column(db.String(255), nullable=True)  # Can be null
 
-    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("America/Chicago")), nullable=False)
 
     # Adding relationship between order and user for admin info
     user = db.relationship('User', backref='orders')
@@ -126,4 +129,4 @@ class Delivery(db.Model):
         nullable=False
     )
 
-    delivery_time = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    delivery_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("America/Chicago")), nullable=False)

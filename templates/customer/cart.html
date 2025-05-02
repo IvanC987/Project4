@@ -26,7 +26,6 @@
     <br /><br /><br />
     <div class="cart">
       <h1>Your Cart</h1>
-      <!-- loop through cart items and display them -->
       <ul>
         {% for item in cart %}
         <li>
@@ -36,8 +35,8 @@
         </li>
         {% endfor %}
       </ul>
-      <!-- display total price -->
-      <p>Total: ${{ total }}</p>
+
+      <p>Subtotal: ${{ total }}</p>
 
       <!-- checkout button -->
       <form action="/checkout" method="GET">
@@ -45,7 +44,7 @@
       </form>
     </div>
 
-    <!-- javascript function to handle removing items from cart -->
+    <!-- To handle removing items from cart -->
     <script>
       function removeFromCart(itemId) {
         fetch("/remove_from_cart", {

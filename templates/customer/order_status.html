@@ -89,6 +89,7 @@
       </nav>
     </header>
     <br /><br /><br />
+    {% include "components/_flash.html" %}
     <div class="order-status">
       <!-- refresh button for reloading the page -->
       <div class="refresh-container">
@@ -109,7 +110,7 @@
             <span>Status: {{ order.status }}</span>
           </div>
           <div class="order-body">
-            <p>Total: ${{ order.total_price }}</p>
+            <p>Total: ${{ "%.2f"|format(order.total_price) }}</p>
           </div>
         </div>
         {% endfor %}

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_styles.css') }}">
 </head>
 <body>
+    {% include "components/_flash.html" %}
     <div class="admin-container">
         <header>
             <h1>Manage Orders</h1>

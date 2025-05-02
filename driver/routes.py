@@ -1,3 +1,4 @@
+import hashlib
 from flask import render_template, request, redirect, url_for, session, flash
 from . import driver_bp
 from models import User, OrderHistory, Delivery, OrderItem, MenuItem, db
@@ -15,14 +16,20 @@ def driver_login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
         user = User.query.filter_by(email=email, role='driver').first()
 
-        if user and user.password == password:
+        if user and user.password == hashed_password:
+            if not user.is_active:
+                flash("Account is inactive. Contact admin.", "error")
+                return redirect(url_for('login'))
+
             session['driver_id'] = user.id
             session['user_role'] = user.role
             return redirect(url_for('driver.dashboard'))
         else:
-            flash('Invalid credentials or not a driver.')
+            flash('Invalid credentials or not a driver.', 'error')
 
     return render_template('driver/login.html')
 
@@ -88,7 +95,10 @@ def update_order_status():
     for delivery in deliveries:
         key = f"status_{delivery.order_id}"
         new_status = request.form.get(key)
-
+        print(delivery)
+        print(new_status)
+        print(delivery.status)
+        print("---------------\n\n")
         if new_status and new_status != delivery.status:
             delivery.status = new_status
             updates += 1
@@ -102,9 +112,9 @@ def update_order_status():
 
     if updates:
         db.session.commit()
-        flash(f"Updated {updates} order(s).")
+        flash(f"Updated {updates} order(s).", "success")
     else:
-        flash("No changes were made.")
+        flash("No changes were made.", "info")
 
     return redirect(url_for('driver.view_orders'))
 
@@ -167,9 +177,9 @@ def update_delivered_orders():
 
     if updates:
         db.session.commit()
-        flash(f"Updated {updates} delivered order(s).")
+        flash(f"Updated {updates} delivered order(s).", "success")
     else:
-        flash("No changes were made.")
+        flash("No changes were made.", "info")
 
     return redirect(url_for('driver.delivered_orders'))
 
@@ -195,12 +205,12 @@ def drop_order(order_id):
             order.status = 'completed'
 
         db.session.commit()
-        flash(f"Order #{order_id} dropped successfully and made available again.")
+        flash(f"Order #{order_id} dropped successfully and made available again.", "success")
 
         return redirect(url_for('driver.available_orders'))
 
     else:
-        flash("No matching order found.")
+        flash("No matching order found.", "warning")
         return redirect(url_for('driver.view_orders'))
 
 
@@ -245,7 +255,7 @@ def claim_order(order_id):
     driver_id = session['driver_id']
     existing = Delivery.query.filter_by(order_id=order_id).first()
     if existing:
-        flash('Order already claimed.')
+        flash('Order already claimed.', 'warning')
         return redirect(url_for('driver.available_orders'))
 
     # Create the new delivery (in-transit)
@@ -257,7 +267,7 @@ def claim_order(order_id):
         order.status = 'in-transit'
 
     db.session.commit()
-    flash(f"Successfully claimed order #{order_id}.")
+    flash(f"Successfully claimed order #{order_id}.", "success")
     return redirect(url_for('driver.view_orders'))
 
 

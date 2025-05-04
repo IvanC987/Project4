@@ -55,6 +55,7 @@ class MenuItem(db.Model):
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     is_available = db.Column(db.Boolean, default=True, nullable=False)
+    image_url = db.Column(db.String(255)) 
 
 
 class OrderHistory(db.Model):

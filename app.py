@@ -81,43 +81,40 @@ def login():  # Very similar to signup
 
     return render_template("customer/login.html")
 
-
-
 @app.route('/menu')
 def menu():
-    # Get only available items
     available_items = MenuItem.query.filter_by(is_available=True).all()
-    
+
     menu_by_category = defaultdict(list)
     for item in available_items:
         menu_by_category[item.category].append(item)
-        
+
     menu_layout = ['Appetizer', 'Salad', 'Entree', 'Barbecue', 'Seafood', 'Side', 'Dessert', 'Drink']
-    
     all_categories = set(menu_by_category.keys())
     other_categories = all_categories - set(menu_layout)
     sorted_categories = menu_layout + sorted(other_categories)
-    
-    return render_template('customer/menu.html', menu=menu_by_category, category_order=sorted_categories)
 
+    return render_template('customer/menu.html', menu=menu_by_category, category_order=sorted_categories)
 
 # Only available as a POST method since we're adding items to cart
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    if 'cart' not in session:  # Create cart
+    print("Add to cart hit!")
+    if 'cart' not in session:
         session['cart'] = []
 
     data = request.get_json()
+    print("Data received:", data)
     item_id = data.get('item_id')
 
-    # Check if item exists in database
     item = MenuItem.query.get(item_id)
     if item:
         session['cart'].append(item_id)
-        session.modified = True  # needed to track changes to session list
+        session.modified = True
         return jsonify({"message": f"{item.name} added to cart!"})
     else:
         return jsonify({"message": "Item not found"}), 404
+
 
 
 @app.route("/cart")
@@ -154,13 +151,30 @@ def remove_from_cart():
     item_id = data.get('item_id')
 
     if 'cart' in session:
-        try:
-            session['cart'].remove(item_id)
-            session.modified = True
-        except ValueError:
-            pass  # item not in cart
+        session['cart'] = [id for id in session['cart'] if id != item_id]
+        session.modified = True
 
     return jsonify({'message': 'Item removed from cart'})
+
+
+@app.route('/update_quantity', methods=['POST'])
+def update_quantity():
+    data = request.get_json()
+    item_id = data.get('item_id')
+    new_quantity = data.get('quantity')
+
+    if 'cart' not in session:
+        return jsonify({'success': False, 'message': 'Cart not found'}), 400
+
+    # Filter out all instances of the item
+    session['cart'] = [id for id in session['cart'] if id != item_id]
+
+    # Add back the item with the new quantity
+    session['cart'].extend([item_id] * new_quantity)
+    session.modified = True
+
+    return jsonify({'success': True})
+
 
 
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -255,6 +269,13 @@ def order_status():
 
     return render_template("customer/order_status.html", orders=order_details)
 
+@app.route('/logout')
+def logout():
+    # Clear the session to log out the user
+    session.clear()
+    
+    # Redirect the user to the homepage or login page after logging out
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -15,11 +15,10 @@
       <nav class="navbar">
         <ul class="nav-links">
           <li><a href="menu">Menu</a></li>
-          <li>
-            <a href="order_status">Order Status</a>
-          </li>
+          <li><a href="order_status">Order Status</a></li>
           <li><a href="cart">Cart</a></li>
           <li><a href="checkout">Checkout</a></li>
+          <li><a href="logout">Log Out</a></li>
         </ul>
       </nav>
     </header>
@@ -29,9 +28,14 @@
       <ul>
         {% for item in cart %}
         <li>
-          {{ item.quantity }}x {{ item.name }} - ${{ item.total }}
-          <!-- button to remove item from cart -->
+          <select onchange="updateQuantity({{ item.id }}, this.value)">
+          {% for i in range(1, 11) %}
+            <option value="{{ i }}" {% if i == item.quantity %}selected{% endif %}>{{ i }}</option>
+          {% endfor %}
+          </select>
+          {{ item.name }} - ${{ item.total }}
           <button onclick="removeFromCart({{ item.id }})">Remove</button>
+          <br />
         </li>
         {% endfor %}
       </ul>
@@ -57,6 +61,23 @@
           .then((response) => response.json())
           .then((data) => {
             location.reload(); // reload cart page to update UI
+          });
+      }
+
+      function updateQuantity(itemId, quantity) {
+        fetch("/update_quantity", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            item_id: itemId,
+            quantity: parseInt(quantity),
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            location.reload(); // reload to reflect updated totals
           });
       }
     </script>

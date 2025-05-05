@@ -1,49 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Flask Webpage</title>
+    <title>Menu</title>
     <link
       rel="stylesheet"
       type="text/css"
       href="{{ url_for('static', filename='customer_styles.css') }}"
     />
-    <style>
-      .menu-container {
-        display: flex;
-        gap: 40px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .category-column {
-        flex: 1;
-        min-width: 300px;
-        max-width: 400px;
-      }
-
-      .category-column h2 {
-        text-align: center;
-        color: #926851;
-      }
-
-      .category-column ul {
-        list-style-type: none;
-        padding: 0;
-      }
-
-      .category-column li {
-        padding: 15px;
-        margin-bottom: 10px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1.2rem;
-      }
-
-      .category-column button {
-        margin-top: 10px;
-      }
-    </style>
   </head>
   <body>
     <header>
@@ -53,38 +16,38 @@
           <li><a href="order_status">Order Status</a></li>
           <li><a href="cart">Cart</a></li>
           <li><a href="checkout">Checkout</a></li>
+          <li><a href="logout">Log Out</a></li>
         </ul>
       </nav>
     </header>
 
     <br /><br /><br />
-    <div class="menu">
-      <div class="logo">
-        <img src="/static/images/logo.png" alt="brand logo" />
-      </div>
-      {% include "components/_flash.html" %}
-      <h1>Menu</h1>
-
-      <div class="menu-container">
-        {% for category in category_order %}
-        {% if category in menu %}
-        <div class="category-column">
-          <h2>{{ category.capitalize() }}</h2>
-          <ul>
-            {% for item in menu[category] %}
-            <li>
-              <strong>{{ item.name }}</strong> - ${{ item.price }}<br />
-              {{ item.description }}<br />
-              <button onclick="addToCart({{ item.item_id }})">
+    {% include "components/_flash.html" %}
+    <h1>MENU</h1>
+    <div class="menu-wrapper">
+      {% for category in category_order %} {% if category in menu %}
+      <div class="category-column">
+        <h2>{{ category.capitalize() }}</h2>
+        <div class="menu-items-grid">
+          {% for item in menu[category] %}
+          <div class="menu-item-box">
+            <div class="image-container">
+              <img src="{{ item.image_url }}" alt="{{ item.name }}" />
+              <button
+                class="add-to-cart-btn"
+                onclick="addToCart({{ item.item_id }})"
+              >
                 Add to Cart
               </button>
-            </li>
-            {% endfor %}
-          </ul>
+            </div>
+            <h3>{{ item.name }}</h3>
+            <p class="price">${{ item.price }}</p>
+            <div class="description">{{ item.description }}</div>
+          </div>
+          {% endfor %}
         </div>
-        {% endif %}
-        {% endfor %}
       </div>
+      {% endif %} {% endfor %}
     </div>
 
     <script>
@@ -98,10 +61,9 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message); 
+            alert(data.message);
           });
       }
     </script>
   </body>
 </html>
-
